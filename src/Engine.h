@@ -9,6 +9,6 @@ static float currentFPS;
 static float currentDeltatime;
 
 void engineInit();
-int engineStartLoop();
-void engineSetTargetFPS(int fps);
+int engineStartLoop(void *thr_id);
+void engineSetTargetFPS(unsigned fps);
 float engineGetCurrentFPS();
