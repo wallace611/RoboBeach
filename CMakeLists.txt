@@ -40,8 +40,9 @@ message(STATUS "C Release Flags: ${CMAKE_C_FLAGS_RELEASE}")
 # Find external libraries
 find_package(OpenGL REQUIRED)
 find_package(GLUT REQUIRED)
+find_package(cglm REQUIRED)
 
-include_directories(${CMAKE_SOURCE_DIR}/src)
+include_directories(${CMAKE_SOURCE_DIR}/engine)
 
 set(Examples
     "RoboBeach"
@@ -51,7 +52,17 @@ foreach(ex IN LISTS Examples)
     message(STATUS "Configuring ${ex}...")
 
     add_executable(${ex})
-    target_sources(${ex} PRIVATE "${ex}.c"   "src/Engine.h" "src/Engine.c" "src/utils/Threading.h")
+    target_sources(
+        ${ex} PRIVATE "${ex}.c"   
+        "engine/Engine.h" 
+        "engine/Engine.c"  
+        "engine/input/MouseEventHandler.h" 
+        "engine/input/MouseEventHandler.c"  
+        "engine/input/KeyboardMapper.h" 
+        "engine/input/KeyboardMapper.c" 
+        "engine/object/Object.h" 
+        "engine/object/Object.c"
+     "engine/utils/Shapes.h" "engine/scene/World.h" "engine/scene/World.c"   "engine/utils/ObjContainer.h"   "engine/utils/ObjContainer.c"   )
     target_link_libraries(${ex} PRIVATE GLUT::GLUT)
 
     if (CMAKE_SYSTEM_NAME STREQUAL "Linux")

@@ -1,13 +1,23 @@
 #include "Engine.h"
-#include "utils/Threading.h"
 
-int main() {
-	engineInit();
+#include "utils/ObjContainer.h"
 
-	thrd_t engineLoop;
-	int thrd_state = thrd_create(&engineLoop, engineStartLoop, NULL);
-	if (thrd_state != thrd_success) {
-		return -1;
+#include <stdio.h>
+
+#include <cglm/cglm.h>
+
+int main(int argc, char** argv) {
+	engineInit(&argc, argv);
+	//engineStartLoop();
+
+	ObjContainer* oc = ocCreate();
+	Object* tmp[10000] = { 0 };
+	for (int i = 0; i < 10000; i++) {
+		tmp[i] = newObject();
+		ocPushBack(oc, tmp[i]);
 	}
-	thrd_join(engineLoop, NULL);
+	for (int i = 0; i < 9998; i++) {
+		ocRemove(oc, tmp[i]);
+	}
+	return 0;
 }
