@@ -29,6 +29,9 @@ void engineInit(int* argc, char** argv) {
 
 	glutCreateWindow("Robo Beach");
 
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_BLEND);
+
 	glutDisplayFunc(displayCallback);
 	glutIdleFunc(idleCallback);
 	glutReshapeFunc(reshapeCallback);
