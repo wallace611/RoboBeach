@@ -1,6 +1,7 @@
 #include "Engine.h"
 
 #include "utils/ObjContainer.h"
+#include "object/Object.h"
 
 #include <stdio.h>
 
@@ -8,16 +9,13 @@
 
 int main(int argc, char** argv) {
 	engineInit(&argc, argv);
-	//engineStartLoop();
+	Object* obj = newObject();
+	glm_translate(obj->transform, (vec3) { -10.0f, 0.0f, -10.0f });
+	worldSpawnObj(world, obj);
+	obj = newObject();
+	glm_translate(obj->transform, (vec3) { 10.0f, 1.0f, -10.0f });
+	worldSpawnObj(world, obj);
+	engineStartLoop();
 
-	ObjContainer* oc = ocCreate();
-	Object* tmp[10000] = { 0 };
-	for (int i = 0; i < 10000; i++) {
-		tmp[i] = newObject();
-		ocPushBack(oc, tmp[i]);
-	}
-	for (int i = 0; i < 9998; i++) {
-		ocRemove(oc, tmp[i]);
-	}
 	return 0;
 }

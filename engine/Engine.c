@@ -7,7 +7,8 @@
 
 #include "input/KeyboardMapper.h"
 #include "input/MouseEventHandler.h"
-#include "utils/Shapes.h"
+#include "object/Camera.h"
+#include "object/Object.h"
 
 void engineInit(int* argc, char** argv) {
 	target_delta_nano = (long long) 1e9 / ENG_DEFAULT_FPS;
@@ -15,6 +16,10 @@ void engineInit(int* argc, char** argv) {
 
 	window_wid = ENG_DEFAULT_WINDOW_WID;
 	window_hei = ENG_DEFAULT_WINDOW_HEI;
+
+	world = newWorld();
+	Object* cam = newCamera();
+	worldSetCamera(world, cam);
 
 	glutInit(argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
@@ -27,8 +32,6 @@ void engineInit(int* argc, char** argv) {
 	glutDisplayFunc(displayCallback);
 	glutIdleFunc(idleCallback);
 	glutReshapeFunc(reshapeCallback);
-
-	SetupMouseFunc(mouseCallback, mouseMotionCallback);
 
 	engineRenderInit();
 
@@ -70,21 +73,23 @@ float engineGetCurrentFPS() {
 	return current_fps;
 }
 
-float rot = 0;
-float ax = 0.0f, az = 0.0f;
-
 void mappingKey() {
-	kmMapFloat2Key('w', KEY_HOLD, moving, 1, 0);
-	kmMapFloat2Key('s', KEY_HOLD, moving, -1, 0);
-	kmMapFloat2Key('a', KEY_HOLD, moving, 0, -1);
-	kmMapFloat2Key('d', KEY_HOLD, moving, 0, 1);
+	kmMapFloat2Key('w', KEY_HOLD, moving, 0, 1);
+	kmMapFloat2Key('s', KEY_HOLD, moving, 0, -1);
+	kmMapFloat2Key('a', KEY_HOLD, moving, 1, 0);
+	kmMapFloat2Key('d', KEY_HOLD, moving, -1, 0);
+	kmMapFloat2Key('q', KEY_HOLD, rotating, 0, -1);
+	kmMapFloat2Key('e', KEY_HOLD, rotating, 0, 1);
+	kmMapFloat2Key('r', KEY_HOLD, rotating, 1, 0);
+	kmMapFloat2Key('f', KEY_HOLD, rotating, -1, 0);
 	
 }
 
 void tick(float deltatime) {
 	kmPressUpdate();
 
-	rot += deltatime * 100;
+	worldUpdate(world, deltatime);
+
 	glutPostRedisplay();
 }
 
@@ -94,15 +99,9 @@ void displayCallback() {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-	glTranslatef(ax, 0.0f, az);
+	world->camera->renderFunction(world->camera);
 
-	glPushMatrix();
-	glTranslatef(-1.0, 0.0f, -2.0);
-	glRotatef(rot, 0.0f, 1.0f, 0.0f);
-
-	drawTriangle();
-
-	glPopMatrix();
+	worldRender(world);
 	
 	glutSwapBuffers();
 }
@@ -134,22 +133,32 @@ void reshapeCallback(int w, int h) {
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(60, aspectRatio, 0.1f, 100.0f);
+	gluPerspective(camGetFOV(), aspectRatio, camGetZNear(), camGetZFar());
 
 	glViewport(0, 0, w, h);
 	glMatrixMode(GL_MODELVIEW);
 }
 
-void mouseCallback(int btn, int state, int x, int y) {
-}
-
-void mouseMotionCallback(int btn, int x, int y) {
-}
-
 void moving(float x, float y) {
-	az += x * 0.01;
-	ax -= y * 0.01;
+	mat4 shift;
+	glm_mat4_identity(shift);
+
+	shift[3][0] = x;
+	shift[3][2] = y;
+
+	mat4 tmp;
+	glm_mat4_copy(world->camera->velocity, tmp);
+	glm_mat4_mul(shift, tmp, world->camera->velocity);
 }
 
-void rotating(float x) {
+void rotating(float pitch, float yaw) {
+	mat4 rot;
+	glm_mat4_identity(rot);
+	
+	glm_rotate_y(rot, yaw * 0.01, rot);
+	glm_rotate_x(rot, pitch * 0.01, rot);
+
+	mat4 tmp;
+	glm_mat4_copy(world->camera->velocity, tmp);
+	glm_mat4_mul(rot, tmp, world->camera->velocity);
 }

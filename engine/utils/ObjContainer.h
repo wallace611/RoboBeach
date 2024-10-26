@@ -14,6 +14,7 @@ ObjContainer* ocCreate();
 int ocPushBack(ObjContainer* container, Object* obj);
 int ocRemove(ObjContainer* container, Object* target);
 int ocClear(ObjContainer* container);
+unsigned ocSize(ObjContainer* container);
 
 static int doubleSize(ObjContainer* container);
 static int divideSize(ObjContainer* container);

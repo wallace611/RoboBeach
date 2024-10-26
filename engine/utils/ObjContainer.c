@@ -48,6 +48,10 @@ int ocClear(ObjContainer* c) {
 
 }
 
+unsigned ocSize(ObjContainer* container) {
+	return container->end;
+}
+
 int doubleSize(ObjContainer* c) {
 	unsigned dsize = c->size << 1;
 	Object** tmp = (Object**)realloc(c->list, sizeof(Object*) * dsize);
