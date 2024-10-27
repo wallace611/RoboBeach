@@ -18,7 +18,7 @@ void engineInit(int* argc, char** argv) {
 	window_hei = ENG_DEFAULT_WINDOW_HEI;
 
 	world = newWorld();
-	Object* cam = newCamera();
+	Camera* cam = newCamera();
 	worldSetCamera(world, cam);
 
 	glutInit(argc, argv);
@@ -102,7 +102,8 @@ void displayCallback() {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-	world->camera->renderFunction(world->camera);
+	Object* camObj = world->cam->obj; // casting
+	camObj->renderFunction(world->cam);
 
 	worldRender(world);
 	
@@ -136,7 +137,7 @@ void reshapeCallback(int w, int h) {
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(camGetFOV(), aspectRatio, camGetZNear(), camGetZFar());
+	gluPerspective(world->cam->fov, aspectRatio, world->cam->zNear, world->cam->zFar);
 
 	glViewport(0, 0, w, h);
 	glMatrixMode(GL_MODELVIEW);
@@ -150,18 +151,22 @@ void moving(float x, float y) {
 	shift[3][2] = y;
 
 	mat4 tmp;
-	glm_mat4_copy(world->camera->velocity, tmp);
-	glm_mat4_mul(shift, tmp, world->camera->velocity);
+	Object* camObj = world->cam->obj;
+	glm_mat4_copy(camObj->velocity, tmp);
+	glm_mat4_mul(shift, tmp, camObj->velocity);
 }
 
 void rotating(float pitch, float yaw) {
-	mat4 rot;
+	world->cam->rotation[0] += pitch * 0.01;
+	world->cam->rotation[1] += yaw * 0.01;
+	/*mat4 rot;
 	glm_mat4_identity(rot);
 	
 	glm_rotate_y(rot, yaw * 0.01, rot);
 	glm_rotate_x(rot, pitch * 0.01, rot);
 
 	mat4 tmp;
-	glm_mat4_copy(world->camera->velocity, tmp);
-	glm_mat4_mul(rot, tmp, world->camera->velocity);
+	Object* camObj = world->cam->obj;
+	glm_mat4_copy(camObj->velocity, tmp);
+	glm_mat4_mul(rot, tmp, camObj->velocity);*/
 }

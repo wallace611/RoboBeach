@@ -9,7 +9,7 @@ World* newWorld() {
 }
 
 void worldUpdate(World* world, float deltatime) {
-    world->camera->updateFunction(world->camera, deltatime);
+    world->cam->obj->updateFunction(world->cam, deltatime);
     for (int i = 0; i < world->instances->end; i++) {
         world->instances->list[i]->updateFunction(world->instances->list[i], deltatime);
     }
@@ -41,8 +41,8 @@ int worldKillObj(World* world, Object* obj) {
     return 1;
 }
 
-void worldSetCamera(World* world, Object* cam) {
+void worldSetCamera(World* world, Camera* cam) {
     if (world == NULL || cam == NULL) return;
 
-    world->camera = cam;
+    world->cam = cam;
 }

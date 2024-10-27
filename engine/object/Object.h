@@ -25,6 +25,7 @@ typedef struct _obj {
 };
 
 Object* newObject();
+Object* inheriteObject();
 static void objReady(Object* obj);
 static void objUpdate(Object* obj, float deltatime);
 static void objRender(Object* obj);

@@ -2,48 +2,70 @@
 
 #include "input/KeyboardMapper.h"
 
-Object* newCamera() {
-	Object* cam = (Object*)malloc(sizeof(Object));
+#include <math.h>
+
+Camera* newCamera() {
+	Camera* cam = (Camera*)malloc(sizeof(Camera));
 	if (cam == NULL) return NULL;
 
-	cam->id = current_id++;
-	glm_mat4_identity(cam->transform);
-	glm_mat4_identity(cam->velocity);
-	cam->obj_type = CAMERA;
+	cam->fov = 60.0f;
+	cam->zNear = 0.1f;
+	cam->zFar = 1000.0f;
+	cam->rotation[0] = 0.0f;
+	cam->rotation[1] = 0.0f;
+	cam->rotation[2] = 0.0f;
 
-	cam->readyFunction = camReady;
-	cam->updateFunction = camUpdate;
-	cam->renderFunction = camRender;
+	cam->obj = inheriteObject();
+	if (cam->obj == NULL) return NULL;
+
+	cam->obj->obj_type = CAMERA;
+
+	cam->obj->readyFunction = camReady;
+	cam->obj->updateFunction = camUpdate;
+	cam->obj->renderFunction = camRender;
+	return cam;
 }
 
-float camGetFOV() {
-	return fov;
-}
-
-float camGetZNear() {
-	return zNear;
-}
-
-float camGetZFar() {
-	return zFar;
-}
-
-void camReady(Object* cam) {
+void camReady(Camera* cam) {
 	
 }
 
-void camUpdate(Object* cam, float deltatime) {
-	mat4 ttmp;
-	glm_mat4_copy(cam->transform, ttmp);
-	mat4 vtmp;
-	glm_mat4_copy(cam->velocity, vtmp);
-	vtmp[3][0] *= deltatime * 5;
-	vtmp[3][1] *= deltatime * 5;
-	vtmp[3][2] *= deltatime * 5;
-	glm_mat4_mul(vtmp, ttmp, cam->transform);
-	glm_mat4_identity(cam->velocity);
+void camUpdate(Camera* cam, float deltatime) {
+	Object* camObj = cam->obj;
+
+	// calculate next position
+	vec4 tloc, vloc;
+	mat4 trot, vrot;
+	vec3 tscl, vscl;
+	glm_decompose(camObj->transform, tloc, trot, tscl);
+	glm_decompose(camObj->velocity, vloc, vrot, vscl);
+	vec3 next = {
+		tloc[0] + vloc[0] * deltatime * 5,
+		tloc[1] + vloc[1] * deltatime * 5,
+		tloc[2] + vloc[2] * deltatime * 5
+	};
+	glm_mat4_identity(camObj->velocity);
+
+	// calculate direction
+	vec3 direction = {
+		cosf(cam->rotation[0]) * cosf(cam->rotation[1]) + next[0],
+		sinf(cam->rotation[0]) + next[1],
+		cosf(cam->rotation[0]) * sinf(cam->rotation[1]) + next[2]
+	};
+
+	// look at position + direction
+	glm_mat4_identity(camObj->transform);
+	glm_lookat(next, direction, (vec3) { 0.0f, 1.0f, 0.0f }, camObj->transform);
+	printf("loc: %f %f %f\n", next[0], next[1], next[2]);
+	printf("dir: %f %f %f\n", direction[0], direction[1], direction[2]);
+
+	// move to next position
+	for (int i = 0; i < 3; i++) {
+		camObj->transform[3][i] = next[i];
+	}
 }
 
-void camRender(Object* cam) {
-	glMultMatrixf(cam->transform);
+void camRender(Camera* cam) {
+	glMultMatrixf(cam->obj->transform);
+	glutSolidCube(1.0f);
 }

@@ -17,6 +17,16 @@ Object* newObject() {
 	return obj;
 }
 
+Object* inheriteObject() {
+	Object* obj = (Object*)malloc(sizeof(Object));
+	if (obj == NULL) return NULL;
+
+	obj->id = current_id++;
+	glm_mat4_identity(obj->transform);
+	glm_mat4_identity(obj->velocity);
+	return obj;
+}
+
 void objReady(Object* obj) {
 	
 }

@@ -2,16 +2,20 @@
 
 #include "object/Object.h"
 
-static float fov = 60.0f;
-static float zNear = 0.1f;
-static float zFar = 1000.0f;
+typedef struct _cam Camera;
 
-Object* newCamera();
+struct _cam {
+	float fov;
+	float zNear;
+	float zFar;
 
-float camGetFOV();
-float camGetZNear();
-float camGetZFar();
+	vec3 rotation;
 
-static void camReady(Object* cam);
-static void camUpdate(Object* cam, float deltatime);
-static void camRender(Object* cam);
+	Object* obj;
+};
+
+Camera* newCamera();
+
+static void camReady(Camera* cam);
+static void camUpdate(Camera* cam, float deltatime);
+static void camRender(Camera* cam);
