@@ -12,11 +12,14 @@ struct _cam {
 	vec3 camPosition;
 	vec3 camFront;
 	vec3 camUp;
+	vec3 camRot;
 
 	float forwardVal;
 	float sideVal;
 	float pitchVal;
 	float yawVal;
+
+	float fraction;
 
 	Object* obj;
 };

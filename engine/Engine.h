@@ -3,7 +3,7 @@
 #include "scene/World.h"
 #include "ui/DebugText.h"
 
-#define ENG_DEFAULT_FPS 300
+#define ENG_DEFAULT_FPS 100
 #define ENG_DEFAULT_WINDOW_WID 1200
 #define ENG_DEFAULT_WINDOW_HEI 700
 #define ENG_DEFAULT_WINDOW_POS_X 100
@@ -36,8 +36,8 @@ static void tick(float deltatime);
 static void displayCallback();
 static void idleCallback();
 static void reshapeCallback(int w, int h);
-static void mouseCallback(int btn, int state, int x, int y);
-static void mouseMotionCallback(int btn, int x, int y);
 
 static void moving(float x, float y);
 static void rotating(float pitch, float yaw);
+
+void p();

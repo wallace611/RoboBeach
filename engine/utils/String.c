@@ -68,7 +68,17 @@ int strAppend(String* str, char text) {
 	return 1;
 }
 
-int strExpand(String* dst, String* src) {
+int strExpandc(String* dst, char* src) {
+	if (dst == NULL || src == NULL || dst->texts == NULL) return -1;
+
+	for (int i = 0; src[i] != '\0'; i++) {
+		strAppend(dst, src[i]);
+	}
+	dst->texts[dst->end] = '\0';
+	return 1;
+}
+
+int strExpands(String* dst, String* src) {
 	if (dst == NULL || src == NULL || dst->texts == NULL || src->texts == NULL) return -1;
 
 	for (int i = 0; i < src->end; i++) {
@@ -102,6 +112,13 @@ void strPopBack(String* str) {
 	if (str->end < str->size >> 2) {
 		str_reduce_size(str);
 	}
+}
+
+void strFree(String* str) {
+	if (str == NULL) return -1;
+
+	free(str->texts);
+	free(str);
 }
 
 int str_double_size(String* str) {

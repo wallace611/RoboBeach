@@ -18,9 +18,10 @@ String* makeString(char* texts, size_t length);
 String* strCpy(String* src);
 char* strToChar(String* src);
 int strAppend(String* str, char text);
-int strExpand(String* dst, String* src);
+int strExpands(String* dst, String* src);
 void strClear(String* str);
 void strPopBack(String* str);
+void strFree(String* str);
 
 static int str_double_size(String* str);
 static int str_reduce_size(String* str);

@@ -56,10 +56,10 @@ foreach(ex IN LISTS Examples)
         ${ex} PRIVATE "${ex}.c"   
         "engine/Engine.h" 
         "engine/Engine.c"  
-        "engine/input/MouseEventHandler.h" 
-        "engine/input/MouseEventHandler.c"  
-        "engine/input/KeyboardMapper.h" 
-        "engine/input/KeyboardMapper.c" 
+         
+          
+        "engine/input/InputMapper.h" 
+        "engine/input/InputMapper.c" 
         "engine/object/Object.h" 
         "engine/object/Object.c"
      "engine/utils/Shapes.h" "engine/scene/World.h" "engine/scene/World.c"   "engine/utils/ObjContainer.h"   "engine/utils/ObjContainer.c"    "engine/object/Camera.h" "engine/object/Camera.c" "engine/ui/DebugText.h" "engine/ui/DebugText.c" "engine/utils/String.h" "engine/utils/String.c" "engine/utils/Shapes.c")

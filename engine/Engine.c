@@ -5,8 +5,7 @@
 
 #include <GL/freeglut.h>
 
-#include "input/KeyboardMapper.h"
-#include "input/MouseEventHandler.h"
+#include "input/InputMapper.h"
 #include "object/Camera.h"
 #include "object/Object.h"
 
@@ -42,7 +41,7 @@ void engineInit(int* argc, char** argv) {
 
 	engineRenderInit();
 
-	kmInit();
+	imInit();
 	mappingKey();
 
 	return 0;
@@ -81,19 +80,19 @@ float engineGetCurrentFPS() {
 }
 
 void mappingKey() {
-	kmMapFloat2Key('w', KEY_HOLD, moving, 1, 0);
-	kmMapFloat2Key('s', KEY_HOLD, moving, -1, 0);
-	kmMapFloat2Key('a', KEY_HOLD, moving, 0, -1);
-	kmMapFloat2Key('d', KEY_HOLD, moving, 0, 1);
-	kmMapFloat2Key('q', KEY_HOLD, rotating, 0, -1);
-	kmMapFloat2Key('e', KEY_HOLD, rotating, 0, 1);
-	kmMapFloat2Key('r', KEY_HOLD, rotating, 1, 0);
-	kmMapFloat2Key('f', KEY_HOLD, rotating, -1, 0);
+	imMapFloat2Key('w', KEY_HOLD, moving, 1, 0);
+	imMapFloat2Key('s', KEY_HOLD, moving, -1, 0);
+	imMapFloat2Key('a', KEY_HOLD, moving, 0, -1);
+	imMapFloat2Key('d', KEY_HOLD, moving, 0, 1);
+	imMapFloat2Key('q', KEY_HOLD, rotating, 0, -1);
+	imMapFloat2Key('e', KEY_HOLD, rotating, 0, 1);
+	imMapFloat2Key('r', KEY_HOLD, rotating, 1, 0);
+	imMapFloat2Key('f', KEY_HOLD, rotating, -1, 0);
 	
 }
 
 void tick(float deltatime) {
-	kmPressUpdate();
+	imPressUpdate();
 
 	worldUpdate(world, deltatime);
 
@@ -115,6 +114,7 @@ void displayCallback() {
 void idleCallback() {
 	struct timespec tmp;
 	long long currentNanoSec = -1;
+
 	while ((currentNanoSec - last_nano) < target_delta_nano) {
 
 		int get_time_state = timespec_get(&tmp, TIME_UTC);
@@ -151,6 +151,10 @@ void moving(float forward, float side) {
 }
 
 void rotating(float pitch, float yaw) {
-	if (pitch != 0) world->cam->pitchVal += pitch;
-	if (yaw != 0) world->cam->yawVal += yaw;
+	if (pitch != 0) world->cam->pitchVal = pitch;
+	if (yaw != 0) world->cam->yawVal = yaw;
+}
+
+void p() {
+	printf("good");
 }

@@ -41,13 +41,13 @@ void dbtRender(DebugText* dbtxt) {
 
     String* s = newString();
 
+    char tmp[1024] = { 0 };
+
+    sprintf(tmp, "Deltatime: %3.4f\nFrame rate: %3.1f\n", dbtxt->deltatime, engineGetCurrentFPS());
+    strExpandc(s, tmp);
+
     for (int i = 0; i < dbtxt->objToShow->end; i++) {
         Object* obj = dbtxt->objToShow->list[i];
-
-        char tmp[1024] = { 0 };
-
-        sprintf(tmp, "Deltatime: %3.1f\n", dbtxt->deltatime);
-        strExpand(s, makeString(tmp, 1024));
 
         switch (obj->obj_type) {
         case CAMERA:
@@ -59,7 +59,7 @@ void dbtRender(DebugText* dbtxt) {
             break;
         }
         
-        strExpand(s, makeString(tmp, 1024));
+        strExpandc(s, tmp);
 
         sprintf(tmp, "Transform Matrix:\n");
         for (int j = 0; j < 4; j++) {
@@ -67,7 +67,7 @@ void dbtRender(DebugText* dbtxt) {
                 obj->transform[j][0], obj->transform[j][1], 
                 obj->transform[j][2], obj->transform[j][3]);
         }
-        strExpand(s, makeString(tmp, 1024));
+        strExpandc(s, tmp);
         strAppend(s, '\n');
 
         vec4 position, scale;
@@ -76,7 +76,7 @@ void dbtRender(DebugText* dbtxt) {
         glm_decompose(obj->transform, position, rotation, scale);
 
         sprintf(tmp, "Position: [ %8.4f, %8.4f, %8.4f ]\n", position[0], position[1], position[2]);
-        strExpand(s, makeString(tmp, 1024));
+        strExpandc(s, tmp);
 
         vec3 eulerAngles;
         glm_euler_angles(rotation, eulerAngles);
@@ -87,16 +87,18 @@ void dbtRender(DebugText* dbtxt) {
 
         sprintf(tmp, "Rotation: [ %8.4f, %8.4f, %8.4f ]\n", 
             eulerAngles[0], eulerAngles[1], eulerAngles[2]);
-        strExpand(s, makeString(tmp, 1024));
+        strExpandc(s, tmp);
 
         sprintf(tmp, "Scale: [ %8.4f, %8.4f, %8.4f ]\n", scale[0], scale[1], scale[2]);
-        strExpand(s, makeString(tmp, 1024));
+        strExpandc(s, tmp);
 
         strAppend(s, '\n');
         strAppend(s, '\n');
     }
 
     glutBitmapString(GLUT_BITMAP_8_BY_13, s->texts);
+
+    strFree(s);
 
     glPopMatrix();
     glMatrixMode(GL_PROJECTION);

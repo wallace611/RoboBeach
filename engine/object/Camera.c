@@ -1,6 +1,6 @@
 #include "Camera.h"
 
-#include "input/KeyboardMapper.h"
+#include "input/InputMapper.h"
 
 #include <math.h>
 
@@ -9,13 +9,15 @@ Camera* newCamera() {
 	if (cam == NULL) return NULL;
 
 	cam->fov = 60.0f;
-	cam->zNear = 0.1f;
+	cam->zNear = 0.9f;
 	cam->zFar = 1000.0f;
 
 	cam->forwardVal = 0.0f;
 	cam->sideVal = 0.0f;
 	cam->pitchVal = 0.0f;
-	cam->yawVal = -90.0f;
+	cam->yawVal = 0.0f;
+
+	cam->fraction = 0.9f;
 
 	cam->obj = inheriteObject();
 	if (cam->obj == NULL) return NULL;
@@ -34,14 +36,16 @@ void camReady(Camera* cam) {
 	glm_vec3_copy((vec3) { 0.0f, 0.0f, 3.0f }, cam->camPosition);
 	glm_vec3_copy((vec3) { 0.0f, 0.0f, -1.0f }, cam->camFront);
 	glm_vec3_copy((vec3) { 0.0f, 1.0f, 0.0f }, cam->camUp);
-
+	glm_vec3_copy((vec3) { 0.0f, -90.0f, 0.0f }, cam->camRot);
 }
 
 void camUpdate(Camera* cam, float deltatime) {
+	cam->camRot[0] += cam->pitchVal * deltatime * 25;
+	cam->camRot[1] += cam->yawVal * deltatime * 25;
 	vec3 dir = {
-		cosf(glm_rad(cam->yawVal)) * cosf(glm_rad(cam->pitchVal)),
-		sinf(glm_rad(cam->pitchVal)),
-		sinf(glm_rad(cam->yawVal)) * cosf(glm_rad(cam->pitchVal))
+		cosf(glm_rad(cam->camRot[1])) * cosf(glm_rad(cam->camRot[0])),
+		sinf(glm_rad(cam->camRot[0])),
+		sinf(glm_rad(cam->camRot[1])) * cosf(glm_rad(cam->camRot[0]))
 	};
 	glm_vec3_normalize_to(dir, cam->camFront);
 
@@ -58,10 +62,12 @@ void camUpdate(Camera* cam, float deltatime) {
 
 	glm_lookat(cam->camPosition, frontPos, cam->camUp, cam->obj->transform);
 
-	cam->forwardVal = 0.0f;
-	cam->sideVal = 0.0f;
 
-	printf("[%f %f %f]\n", cam->camPosition[0], cam->camPosition[1], cam->camPosition[2]);
+	float m = 1 - pow(3, -100 * deltatime);
+	cam->forwardVal *= cam->fraction * m;
+	cam->sideVal *= cam->fraction * m;
+	cam->pitchVal *= cam->fraction * m;
+	cam->yawVal *= cam->fraction * m;
 }
 
 void camRender(Camera* cam) {
