@@ -16,12 +16,13 @@ typedef struct _obj Object;
 typedef struct _obj {
 	int id;
 	mat4 transform;
-	mat4 velocity;
+
+	float movSpeed;
 	obj_type_t obj_type;
 	
-	void (*readyFunction) (Object* obj);
-	void (*updateFunction) (Object* obj, float deltatime);
-	void (*renderFunction) (Object* obj);
+	void (*ready) (Object* obj);
+	void (*update) (Object* obj, float deltatime);
+	void (*render) (Object* obj);
 };
 
 Object* newObject();

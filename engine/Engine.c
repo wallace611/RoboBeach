@@ -21,6 +21,10 @@ void engineInit(int* argc, char** argv) {
 	Camera* cam = newCamera();
 	worldSetCamera(world, cam);
 
+	objDebug = newDebugText();
+
+	ocPushBack(objDebug->objToShow, cam->obj);
+
 	glutInit(argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
 
@@ -77,10 +81,10 @@ float engineGetCurrentFPS() {
 }
 
 void mappingKey() {
-	kmMapFloat2Key('w', KEY_HOLD, moving, 0, 1);
-	kmMapFloat2Key('s', KEY_HOLD, moving, 0, -1);
-	kmMapFloat2Key('a', KEY_HOLD, moving, 1, 0);
-	kmMapFloat2Key('d', KEY_HOLD, moving, -1, 0);
+	kmMapFloat2Key('w', KEY_HOLD, moving, 1, 0);
+	kmMapFloat2Key('s', KEY_HOLD, moving, -1, 0);
+	kmMapFloat2Key('a', KEY_HOLD, moving, 0, -1);
+	kmMapFloat2Key('d', KEY_HOLD, moving, 0, 1);
 	kmMapFloat2Key('q', KEY_HOLD, rotating, 0, -1);
 	kmMapFloat2Key('e', KEY_HOLD, rotating, 0, 1);
 	kmMapFloat2Key('r', KEY_HOLD, rotating, 1, 0);
@@ -93,19 +97,17 @@ void tick(float deltatime) {
 
 	worldUpdate(world, deltatime);
 
+	objDebug->update(objDebug, deltatime);
+
 	glutPostRedisplay();
 }
 
 void displayCallback() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-
-	Object* camObj = world->cam->obj; // casting
-	camObj->renderFunction(world->cam);
-
 	worldRender(world);
+
+	objDebug->render(objDebug);
 	
 	glutSwapBuffers();
 }
@@ -143,30 +145,12 @@ void reshapeCallback(int w, int h) {
 	glMatrixMode(GL_MODELVIEW);
 }
 
-void moving(float x, float y) {
-	mat4 shift;
-	glm_mat4_identity(shift);
-
-	shift[3][0] = x;
-	shift[3][2] = y;
-
-	mat4 tmp;
-	Object* camObj = world->cam->obj;
-	glm_mat4_copy(camObj->velocity, tmp);
-	glm_mat4_mul(shift, tmp, camObj->velocity);
+void moving(float forward, float side) {
+	if (forward != 0) world->cam->forwardVal = forward;
+	if (side != 0) world->cam->sideVal = side;
 }
 
 void rotating(float pitch, float yaw) {
-	world->cam->rotation[0] += pitch * 0.01;
-	world->cam->rotation[1] += yaw * 0.01;
-	/*mat4 rot;
-	glm_mat4_identity(rot);
-	
-	glm_rotate_y(rot, yaw * 0.01, rot);
-	glm_rotate_x(rot, pitch * 0.01, rot);
-
-	mat4 tmp;
-	Object* camObj = world->cam->obj;
-	glm_mat4_copy(camObj->velocity, tmp);
-	glm_mat4_mul(rot, tmp, camObj->velocity);*/
+	if (pitch != 0) world->cam->pitchVal += pitch;
+	if (yaw != 0) world->cam->yawVal += yaw;
 }

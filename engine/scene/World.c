@@ -1,23 +1,30 @@
 #include "World.h"
 
+#include "utils/Shapes.h"
+
 World* newWorld() {
     World* world = (World*)malloc(sizeof(World));
     if (world == NULL) return NULL;
 
-    world->instances = ocCreate();
+    world->instances = newObjContainer();
     return world;
 }
 
 void worldUpdate(World* world, float deltatime) {
-    world->cam->obj->updateFunction(world->cam, deltatime);
+    world->cam->obj->update(world->cam, deltatime);
     for (int i = 0; i < world->instances->end; i++) {
-        world->instances->list[i]->updateFunction(world->instances->list[i], deltatime);
+        world->instances->list[i]->update(world->instances->list[i], deltatime);
     }
 }
 
 void worldRender(World* world) {
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+    world->cam->obj->render(world->cam);
+
     for (int i = 0; i < world->instances->end; i++) {
-        world->instances->list[i]->renderFunction(world->instances->list[i]);
+        world->instances->list[i]->render(world->instances->list[i]);
     }
 }
 
@@ -27,7 +34,7 @@ int worldSpawnObj(World* world, Object* obj) {
     int flag = ocPushBack(world->instances, obj);
     if (flag != 1) return -1;
 
-    obj->readyFunction(obj);
+    obj->ready(obj);
     return 1;
 }
 
@@ -45,4 +52,5 @@ void worldSetCamera(World* world, Camera* cam) {
     if (world == NULL || cam == NULL) return;
 
     world->cam = cam;
+    cam->obj->ready(cam);
 }

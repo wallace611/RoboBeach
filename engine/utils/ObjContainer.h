@@ -5,12 +5,12 @@
 #define OC_DEFAULT_SIZE 8
 
 typedef struct container {
-	unsigned size;
-	unsigned end;
+	size_t size;
+	size_t end;
 	Object** list;
 } ObjContainer;
 
-ObjContainer* ocCreate();
+ObjContainer* newObjContainer();
 int ocPushBack(ObjContainer* container, Object* obj);
 int ocRemove(ObjContainer* container, Object* target);
 int ocClear(ObjContainer* container);

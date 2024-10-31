@@ -2,7 +2,7 @@
 
 #include <stdlib.h>
 
-ObjContainer* ocCreate() {
+ObjContainer* newObjContainer() {
 	ObjContainer* c = (ObjContainer*)malloc(sizeof(ObjContainer));
 	if (c == NULL) return NULL;
 

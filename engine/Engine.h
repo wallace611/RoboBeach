@@ -1,15 +1,16 @@
 #pragma once
 
 #include "scene/World.h"
+#include "ui/DebugText.h"
 
-#define ENG_DEFAULT_FPS 120
+#define ENG_DEFAULT_FPS 300
 #define ENG_DEFAULT_WINDOW_WID 1200
 #define ENG_DEFAULT_WINDOW_HEI 700
 #define ENG_DEFAULT_WINDOW_POS_X 100
 #define ENG_DEFAULT_WINDOW_POS_Y 100
 
 // render handle
-static int window_wid, window_hei;
+int window_wid, window_hei;
 
 // frame rate handle
 static long long last_nano;
@@ -18,6 +19,8 @@ static float current_fps;
 static float current_deltatime;
 
 World* world;
+
+DebugText* objDebug;
 
 // engine functions
 void engineInit(int* argc, char** argv);

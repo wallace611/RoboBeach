@@ -11,61 +11,66 @@ Camera* newCamera() {
 	cam->fov = 60.0f;
 	cam->zNear = 0.1f;
 	cam->zFar = 1000.0f;
-	cam->rotation[0] = 0.0f;
-	cam->rotation[1] = 0.0f;
-	cam->rotation[2] = 0.0f;
+
+	cam->forwardVal = 0.0f;
+	cam->sideVal = 0.0f;
+	cam->pitchVal = 0.0f;
+	cam->yawVal = -90.0f;
 
 	cam->obj = inheriteObject();
 	if (cam->obj == NULL) return NULL;
 
 	cam->obj->obj_type = CAMERA;
+	cam->obj->movSpeed = 5.0f;
 
-	cam->obj->readyFunction = camReady;
-	cam->obj->updateFunction = camUpdate;
-	cam->obj->renderFunction = camRender;
+	cam->obj->ready = camReady;
+	cam->obj->update = camUpdate;
+	cam->obj->render = camRender;
+
 	return cam;
 }
 
 void camReady(Camera* cam) {
-	
+	glm_vec3_copy((vec3) { 0.0f, 0.0f, 3.0f }, cam->camPosition);
+	glm_vec3_copy((vec3) { 0.0f, 0.0f, -1.0f }, cam->camFront);
+	glm_vec3_copy((vec3) { 0.0f, 1.0f, 0.0f }, cam->camUp);
+
 }
 
 void camUpdate(Camera* cam, float deltatime) {
-	Object* camObj = cam->obj;
-
-	// calculate next position
-	vec4 tloc, vloc;
-	mat4 trot, vrot;
-	vec3 tscl, vscl;
-	glm_decompose(camObj->transform, tloc, trot, tscl);
-	glm_decompose(camObj->velocity, vloc, vrot, vscl);
-	vec3 next = {
-		tloc[0] + vloc[0] * deltatime * 5,
-		tloc[1] + vloc[1] * deltatime * 5,
-		tloc[2] + vloc[2] * deltatime * 5
+	vec3 dir = {
+		cosf(glm_rad(cam->yawVal)) * cosf(glm_rad(cam->pitchVal)),
+		sinf(glm_rad(cam->pitchVal)),
+		sinf(glm_rad(cam->yawVal)) * cosf(glm_rad(cam->pitchVal))
 	};
-	glm_mat4_identity(camObj->velocity);
+	glm_vec3_normalize_to(dir, cam->camFront);
 
-	// calculate direction
-	vec3 direction = {
-		cosf(cam->rotation[0]) * cosf(cam->rotation[1]) + next[0],
-		sinf(cam->rotation[0]) + next[1],
-		cosf(cam->rotation[0]) * sinf(cam->rotation[1]) + next[2]
-	};
+	// camPosition += movSpeed (scalar) * forwardVal (scalar) * camFront (vec3);
+	glm_vec3_muladds(cam->camFront, cam->obj->movSpeed * cam->forwardVal * deltatime, cam->camPosition);
 
-	// look at position + direction
-	glm_mat4_identity(camObj->transform);
-	glm_lookat(next, direction, (vec3) { 0.0f, 1.0f, 0.0f }, camObj->transform);
-	printf("loc: %f %f %f\n", next[0], next[1], next[2]);
-	printf("dir: %f %f %f\n", direction[0], direction[1], direction[2]);
+	// camPosition -= normalize(camFront X camUp) * movSpeed * sideVal;
+	vec3 frontXup;
+	glm_vec3_crossn(cam->camFront, cam->camUp, frontXup);
+	glm_vec3_muladds(frontXup, cam->obj->movSpeed * cam->sideVal * deltatime, cam->camPosition);
 
-	// move to next position
-	for (int i = 0; i < 3; i++) {
-		camObj->transform[3][i] = next[i];
-	}
+	vec3 frontPos;
+	glm_vec3_add(cam->camPosition, cam->camFront, frontPos);
+
+	glm_lookat(cam->camPosition, frontPos, cam->camUp, cam->obj->transform);
+
+	cam->forwardVal = 0.0f;
+	cam->sideVal = 0.0f;
+
+	printf("[%f %f %f]\n", cam->camPosition[0], cam->camPosition[1], cam->camPosition[2]);
 }
 
 void camRender(Camera* cam) {
-	glMultMatrixf(cam->obj->transform);
-	glutSolidCube(1.0f);
+	mat4 mirrorXZ;
+	glm_mat4_identity(mirrorXZ);
+	mirrorXZ[0][0] = -1;
+	mirrorXZ[2][2] = -1;
+
+	mat4 ttmp;
+	glm_mat4_mul(cam->obj->transform, mirrorXZ, ttmp);
+	glMultMatrixf(ttmp);
 }

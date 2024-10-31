@@ -9,7 +9,14 @@ struct _cam {
 	float zNear;
 	float zFar;
 
-	vec3 rotation;
+	vec3 camPosition;
+	vec3 camFront;
+	vec3 camUp;
+
+	float forwardVal;
+	float sideVal;
+	float pitchVal;
+	float yawVal;
 
 	Object* obj;
 };

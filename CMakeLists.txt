@@ -62,7 +62,7 @@ foreach(ex IN LISTS Examples)
         "engine/input/KeyboardMapper.c" 
         "engine/object/Object.h" 
         "engine/object/Object.c"
-     "engine/utils/Shapes.h" "engine/scene/World.h" "engine/scene/World.c"   "engine/utils/ObjContainer.h"   "engine/utils/ObjContainer.c"    "engine/object/Camera.h" "engine/object/Camera.c")
+     "engine/utils/Shapes.h" "engine/scene/World.h" "engine/scene/World.c"   "engine/utils/ObjContainer.h"   "engine/utils/ObjContainer.c"    "engine/object/Camera.h" "engine/object/Camera.c" "engine/ui/DebugText.h" "engine/ui/DebugText.c" "engine/utils/String.h" "engine/utils/String.c" "engine/utils/Shapes.c")
     target_link_libraries(${ex} PRIVATE GLUT::GLUT)
 
     if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
