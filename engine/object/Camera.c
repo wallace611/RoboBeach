@@ -40,8 +40,17 @@ void camReady(Camera* cam) {
 }
 
 void camUpdate(Camera* cam, float deltatime) {
+	cam->camRot[0] = fmod(cam->camRot[0], 360.0f);
+	cam->camRot[1] = fmod(cam->camRot[1], 360.0f);
+	cam->camRot[2] = fmod(cam->camRot[2], 360.0f);
+
+	float lastPitch = cam->camRot[0];
 	cam->camRot[0] += cam->pitchVal * deltatime * 25;
 	cam->camRot[1] += cam->yawVal * deltatime * 25;
+	if (cam->camRot[0] > 90 || cam->camRot[0] < -90) {
+		cam->camRot[0] = lastPitch;
+	}
+
 	vec3 dir = {
 		cosf(glm_rad(cam->camRot[1])) * cosf(glm_rad(cam->camRot[0])),
 		sinf(glm_rad(cam->camRot[0])),
@@ -62,12 +71,10 @@ void camUpdate(Camera* cam, float deltatime) {
 
 	glm_lookat(cam->camPosition, frontPos, cam->camUp, cam->obj->transform);
 
-
-	float m = 1 - pow(3, -100 * deltatime);
-	cam->forwardVal *= cam->fraction * m;
-	cam->sideVal *= cam->fraction * m;
-	cam->pitchVal *= cam->fraction * m;
-	cam->yawVal *= cam->fraction * m;
+	cam->forwardVal *= cam->fraction;
+	cam->sideVal *= cam->fraction;
+	cam->pitchVal *= cam->fraction;
+	cam->yawVal *= cam->fraction;
 }
 
 void camRender(Camera* cam) {

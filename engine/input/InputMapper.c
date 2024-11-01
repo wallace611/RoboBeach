@@ -11,30 +11,48 @@ void imInit() {
 	glutMouseFunc(mouseActionCallback);
 	glutMouseWheelFunc(mouseWheelCallback);
 	glutPassiveMotionFunc(mouseMovementCallback);
+
+	allowMouseMotion = 0;
+	mouse_first_motion = 1;
 }
 
-void imMapActionKey(int key, int actions, void (*callbackFunc)()) {
+void imMapActionKey(int key, action_t actions, void (*callbackFunc)()) {
 	key_map[key].isActivate = 1;
-	key_map[key].actions = actions;
-	key_map[key].funcType = ACTION_FUNC;
-	key_map[key].functions[actions].ActionFunction = callbackFunc;
+	key_map[key].actions|= actions;
+	action_t tmp = actions;
+	int cnt = -1;
+	while (tmp) tmp >>= 1, cnt += 1;
+	if (cnt < 0) cnt = 0;
+	if (cnt >= 3) cnt = 2;
+	key_map[key].funcType[cnt] = ACTION_FUNC;
+	key_map[key].functions[cnt].ActionFunction = callbackFunc;
 }
 
-void imMapFloat1Key(int key, int actions, void(*callbackFunc)(float), float arg) {
+void imMapFloat1Key(int key, action_t actions, void(*callbackFunc)(float), float arg) {
 	key_map[key].isActivate = 1;
-	key_map[key].actions = actions;
-	key_map[key].funcType = FLOAT1_FUNC;
-	key_map[key].functions[actions].float1Function = callbackFunc;
-	key_map[key].functions[actions].arg = arg;
+	key_map[key].actions |= actions;
+	action_t tmp = actions;
+	int cnt = -1;
+	while (tmp) tmp >>= 1, cnt += 1;
+	if (cnt < 0) cnt = 0;
+	if (cnt >= 3) cnt = 2;
+	key_map[key].funcType[cnt] = FLOAT1_FUNC;
+	key_map[key].functions[cnt].float1Function = callbackFunc;
+	key_map[key].functions[cnt].arg = arg;
 }
 
-void imMapFloat2Key(int key, int actions, void(*callbackFunc)(float, float), float argx, float argy) {
+void imMapFloat2Key(int key, action_t actions, void(*callbackFunc)(float, float), float argx, float argy) {
 	key_map[key].isActivate = 1;
-	key_map[key].actions = actions;
-	key_map[key].funcType = FLOAT2_FUNC;
-	key_map[key].functions[actions].float2Function = callbackFunc;
-	key_map[key].functions[actions].argx = argx;
-	key_map[key].functions[actions].argy = argy;
+	key_map[key].actions |= actions;
+	action_t tmp = actions;
+	int cnt = -1;
+	while (tmp) tmp >>= 1, cnt += 1;
+	if (cnt < 0) cnt = 0;
+	if (cnt >= 3) cnt = 2;
+	key_map[key].funcType[cnt] = FLOAT2_FUNC;
+	key_map[key].functions[cnt].float2Function = callbackFunc;
+	key_map[key].functions[cnt].argx = argx;
+	key_map[key].functions[cnt].argy = argy;
 }
 
 void imPressUpdate() {
@@ -42,20 +60,17 @@ void imPressUpdate() {
 	// keyboard
 	for (i = 0; i < MAPPER_KEY_SIZE; i++) {
 		if (key_map[i].isActivate) {
-			if (i == 119 && key_pressed[i]) {
-				printf("nice");
-			}
 			action_t keyAction = key_map[i].actions;
 
-			if ((keyAction == KEY_PRESS) && key_pressed[i] == 1 && last_key_pressed[i] == 0) {
-				callFunc(key_map[i].funcType, key_map[i].functions[0]);
+			if ((keyAction & KEY_PRESS) && key_pressed[i] == 1 && last_key_pressed[i] == 0) {
+				callFunc(key_map[i].funcType[0], key_map[i].functions[0]);
 			}
-			if ((keyAction == KEY_RELEASE) && key_pressed[i] == 0 && last_key_pressed[i] == 1) {
-				callFunc(key_map[i].funcType, key_map[i].functions[1]);
+			if ((keyAction & KEY_RELEASE) && key_pressed[i] == 0 && last_key_pressed[i] == 1) {
+				callFunc(key_map[i].funcType[1], key_map[i].functions[1]);
 			}
 
-			if ((keyAction == KEY_HOLD) && key_pressed[i] == 1) {
-				callFunc(key_map[i].funcType, key_map[i].functions[2]);
+			if ((keyAction & KEY_HOLD) && key_pressed[i] == 1) {
+				callFunc(key_map[i].funcType[2], key_map[i].functions[2]);
 			}
 			last_key_pressed[i] = key_pressed[i];
 		}
@@ -70,7 +85,21 @@ void imPressUpdate() {
 	// mouse motion
 	i = MOUSE_MOTION;
 	if (key_map[i].isActivate) {
-		action_t keyAction = key_map[i].actions;
+		if (!mouse_first_motion) {
+			action_t keyAction = key_map[i].actions;
+
+			int x = btn_pressed[4].x - last_btn_pressed[4].x;
+			int y = btn_pressed[4].y - last_btn_pressed[4].y;
+
+			callMotionFunc(key_map[i].functions[0], x, y);
+
+			last_btn_pressed[4].pressed = btn_pressed[4].pressed;
+			last_btn_pressed[4].x = btn_pressed[4].x;
+			last_btn_pressed[4].y = btn_pressed[4].y;
+		}
+		else {
+
+		}
 	}
 
 }
@@ -114,4 +143,9 @@ void callFunc(func_t type, CallbackFunction func) {
 		func.float2Function(func.argx, func.argy);
 		break;
 	}
+}
+
+void callMotionFunc(CallbackFunction func, int x, int y) {
+	if (!allowMouseMotion) return;
+	func.float2Function(y, -x);
 }

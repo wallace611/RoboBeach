@@ -16,6 +16,12 @@ void engineInit(int* argc, char** argv) {
 	window_wid = ENG_DEFAULT_WINDOW_WID;
 	window_hei = ENG_DEFAULT_WINDOW_HEI;
 
+	mouse_center_x = window_wid >> 1;
+	mouse_center_y = window_hei >> 1;
+
+	is_paused = 0;
+	timer = -3.0;
+
 	world = newWorld();
 	Camera* cam = newCamera();
 	worldSetCamera(world, cam);
@@ -38,6 +44,8 @@ void engineInit(int* argc, char** argv) {
 	glutDisplayFunc(displayCallback);
 	glutIdleFunc(idleCallback);
 	glutReshapeFunc(reshapeCallback);
+
+	glutSetCursor(GLUT_CURSOR_NONE);
 
 	engineRenderInit();
 
@@ -79,6 +87,10 @@ float engineGetCurrentFPS() {
 	return current_fps;
 }
 
+double engineGetTimer() {
+	return timer;
+}
+
 void mappingKey() {
 	imMapFloat2Key('w', KEY_HOLD, moving, 1, 0);
 	imMapFloat2Key('s', KEY_HOLD, moving, -1, 0);
@@ -88,15 +100,31 @@ void mappingKey() {
 	imMapFloat2Key('e', KEY_HOLD, rotating, 0, 1);
 	imMapFloat2Key('r', KEY_HOLD, rotating, 1, 0);
 	imMapFloat2Key('f', KEY_HOLD, rotating, -1, 0);
-	
+	imMapFloat2Key(MOUSE_MOTION, NULL, rotating, 0, 0);
+	imMapActionKey(27, KEY_PRESS, pause);
 }
 
 void tick(float deltatime) {
+	timer += deltatime;
+	printf("%f\n", timer);
+
 	imPressUpdate();
 
-	worldUpdate(world, deltatime);
+	if (!is_paused) {
+		worldUpdate(world, deltatime);
 
-	objDebug->update(objDebug, deltatime);
+		objDebug->update(objDebug, deltatime);
+
+		// warp the cursor
+		if (allowMouseMotion && timer > 0) {
+			glutWarpPointer(mouse_center_x, mouse_center_y);
+			allowMouseMotion = 0;
+			printf("allow\n");
+		}
+		else if (timer > 0) {
+			allowMouseMotion = 1;
+		}
+	}
 
 	glutPostRedisplay();
 }
@@ -135,6 +163,10 @@ void idleCallback() {
 void reshapeCallback(int w, int h) {
 	window_wid = w;
 	window_hei = h;
+
+	mouse_center_x = window_wid >> 1;
+	mouse_center_y = window_hei >> 1;
+
 	double aspectRatio = (double) w / (double) h;
 
 	glMatrixMode(GL_PROJECTION);
@@ -155,6 +187,16 @@ void rotating(float pitch, float yaw) {
 	if (yaw != 0) world->cam->yawVal = yaw;
 }
 
-void p() {
-	printf("good");
+void pause() {
+	if (is_paused) {
+		glutSetCursor(GLUT_CURSOR_NONE);
+		is_paused = !is_paused;
+		allowMouseMotion = 0;
+		glutWarpPointer(mouse_center_x, mouse_center_y);
+	}
+	else {
+		glutSetCursor(GLUT_CURSOR_LEFT_ARROW);
+		is_paused = !is_paused;
+	}
+	
 }
