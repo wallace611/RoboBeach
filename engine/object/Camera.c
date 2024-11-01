@@ -17,6 +17,9 @@ Camera* newCamera() {
 	cam->pitchVal = 0.0f;
 	cam->yawVal = 0.0f;
 
+	cam->pitchSensitivity = 2.0f;
+	cam->yawSensitivity = 2.0f;
+
 	cam->fraction = 0.9f;
 
 	cam->obj = inheriteObject();
@@ -45,8 +48,8 @@ void camUpdate(Camera* cam, float deltatime) {
 	cam->camRot[2] = fmod(cam->camRot[2], 360.0f);
 
 	float lastPitch = cam->camRot[0];
-	cam->camRot[0] += cam->pitchVal * deltatime;
-	cam->camRot[1] += cam->yawVal * deltatime;
+	cam->camRot[0] += cam->pitchVal * deltatime * cam->pitchSensitivity;
+	cam->camRot[1] += cam->yawVal * deltatime * cam->yawSensitivity;
 	if (cam->camRot[0] > 90 || cam->camRot[0] < -90) {
 		cam->camRot[0] = lastPitch;
 	}

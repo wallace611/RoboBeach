@@ -19,6 +19,9 @@ struct _cam {
 	float pitchVal;
 	float yawVal;
 
+	float pitchSensitivity;
+	float yawSensitivity;
+
 	float fraction;
 
 	Object* obj;

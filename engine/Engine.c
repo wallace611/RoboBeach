@@ -102,8 +102,6 @@ void mappingKey() {
 	imMapFloat2Key('f', KEY_HOLD, rotating, -1, 0);
 	imMapFloat2Key(MOUSE_MOTION, NULL, rotating, 0, 0);
 	imMapActionKey(27, KEY_PRESS, pause);
-
-	imMapActionKey('v', KEY_PRESS, test);
 }
 
 void tick(float deltatime) {
@@ -116,15 +114,13 @@ void tick(float deltatime) {
 
 		objDebug->update(objDebug, deltatime);
 
-		static double warpTimer;
-
 		// warp the cursor to the center
 		if (allowMouseMotion) {
 			glutWarpPointer(mouse_center_x, mouse_center_y);
 			allowMouseMotion = 0;
-			warpTimer = timer;
+			warp_time = timer;
 		}
-		else if (timer - warpTimer > .02) {
+		else if (timer - warp_time > deltatime) {
 			allowMouseMotion = 1;
 		}
 	}
@@ -196,14 +192,10 @@ void pause() {
 		is_paused = !is_paused;
 		allowMouseMotion = 0;
 		glutWarpPointer(mouse_center_x, mouse_center_y);
+		warp_time = timer;
 	}
 	else {
 		glutSetCursor(GLUT_CURSOR_LEFT_ARROW);
 		is_paused = !is_paused;
 	}
-	
-}
-
-void test() {
-	allowMouseMotion = !allowMouseMotion;
 }

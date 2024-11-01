@@ -24,6 +24,8 @@ static unsigned char is_paused;
 
 static double timer;
 
+static double warp_time;
+
 World* world;
 
 DebugText* objDebug;
@@ -48,5 +50,3 @@ static void moving(float x, float y);
 static void rotating(float pitch, float yaw);
 
 static void pause();
-
-static void test();
