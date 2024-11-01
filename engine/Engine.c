@@ -20,7 +20,7 @@ void engineInit(int* argc, char** argv) {
 	mouse_center_y = window_hei >> 1;
 
 	is_paused = 0;
-	timer = -3.0;
+	timer = 0.0;
 
 	world = newWorld();
 	Camera* cam = newCamera();
@@ -102,11 +102,12 @@ void mappingKey() {
 	imMapFloat2Key('f', KEY_HOLD, rotating, -1, 0);
 	imMapFloat2Key(MOUSE_MOTION, NULL, rotating, 0, 0);
 	imMapActionKey(27, KEY_PRESS, pause);
+
+	imMapActionKey('v', KEY_PRESS, test);
 }
 
 void tick(float deltatime) {
 	timer += deltatime;
-	printf("%f\n", timer);
 
 	imPressUpdate();
 
@@ -115,13 +116,15 @@ void tick(float deltatime) {
 
 		objDebug->update(objDebug, deltatime);
 
-		// warp the cursor
-		if (allowMouseMotion && timer > 0) {
+		static double warpTimer;
+
+		// warp the cursor to the center
+		if (allowMouseMotion) {
 			glutWarpPointer(mouse_center_x, mouse_center_y);
 			allowMouseMotion = 0;
-			printf("allow\n");
+			warpTimer = timer;
 		}
-		else if (timer > 0) {
+		else if (timer - warpTimer > .02) {
 			allowMouseMotion = 1;
 		}
 	}
@@ -183,8 +186,8 @@ void moving(float forward, float side) {
 }
 
 void rotating(float pitch, float yaw) {
-	if (pitch != 0) world->cam->pitchVal = pitch;
-	if (yaw != 0) world->cam->yawVal = yaw;
+	if (pitch != 0) world->cam->pitchVal += pitch;
+	if (yaw != 0) world->cam->yawVal += yaw;
 }
 
 void pause() {
@@ -199,4 +202,8 @@ void pause() {
 		is_paused = !is_paused;
 	}
 	
+}
+
+void test() {
+	allowMouseMotion = !allowMouseMotion;
 }

@@ -13,7 +13,6 @@ void imInit() {
 	glutPassiveMotionFunc(mouseMovementCallback);
 
 	allowMouseMotion = 0;
-	mouse_first_motion = 1;
 }
 
 void imMapActionKey(int key, action_t actions, void (*callbackFunc)()) {
@@ -85,21 +84,18 @@ void imPressUpdate() {
 	// mouse motion
 	i = MOUSE_MOTION;
 	if (key_map[i].isActivate) {
-		if (!mouse_first_motion) {
+		if (allowMouseMotion) {
 			action_t keyAction = key_map[i].actions;
 
 			int x = btn_pressed[4].x - last_btn_pressed[4].x;
 			int y = btn_pressed[4].y - last_btn_pressed[4].y;
 
 			callMotionFunc(key_map[i].functions[0], x, y);
-
-			last_btn_pressed[4].pressed = btn_pressed[4].pressed;
-			last_btn_pressed[4].x = btn_pressed[4].x;
-			last_btn_pressed[4].y = btn_pressed[4].y;
 		}
-		else {
 
-		}
+		last_btn_pressed[4].pressed = btn_pressed[4].pressed;
+		last_btn_pressed[4].x = btn_pressed[4].x;
+		last_btn_pressed[4].y = btn_pressed[4].y;
 	}
 
 }
@@ -146,6 +142,5 @@ void callFunc(func_t type, CallbackFunction func) {
 }
 
 void callMotionFunc(CallbackFunction func, int x, int y) {
-	if (!allowMouseMotion) return;
-	func.float2Function(y, -x);
+	func.float2Function(-y, x);
 }

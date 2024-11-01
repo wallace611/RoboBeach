@@ -45,8 +45,8 @@ void camUpdate(Camera* cam, float deltatime) {
 	cam->camRot[2] = fmod(cam->camRot[2], 360.0f);
 
 	float lastPitch = cam->camRot[0];
-	cam->camRot[0] += cam->pitchVal * deltatime * 25;
-	cam->camRot[1] += cam->yawVal * deltatime * 25;
+	cam->camRot[0] += cam->pitchVal * deltatime;
+	cam->camRot[1] += cam->yawVal * deltatime;
 	if (cam->camRot[0] > 90 || cam->camRot[0] < -90) {
 		cam->camRot[0] = lastPitch;
 	}

@@ -43,7 +43,7 @@ void dbtRender(DebugText* dbtxt) {
 
     char tmp[1024] = { 0 };
 
-    sprintf(tmp, "Deltatime: %3.4f\nFrame rate: %3.1f\nTimer: %3.3f\n", dbtxt->deltatime, engineGetCurrentFPS(), engineGetTimer());
+    sprintf(tmp, "Deltatime: %3.4f\nFrame rate: %3.1f\nTimer: %3.2f\n", dbtxt->deltatime, engineGetCurrentFPS(), engineGetTimer());
     strExpandc(s, tmp);
 
     for (int i = 0; i < dbtxt->objToShow->end; i++) {

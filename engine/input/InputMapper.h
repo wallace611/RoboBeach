@@ -65,7 +65,6 @@ static BtnInfo last_btn_pressed[5] = { 0 };
 static ActionMapper key_map[MAPPER_SIZE] = { 0 };
 
 unsigned char allowMouseMotion;
-static unsigned char mouse_first_motion;
 
 void imInit();
 void imMapActionKey(int key, action_t actions, void (*callbackFunc)());

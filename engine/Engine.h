@@ -48,3 +48,5 @@ static void moving(float x, float y);
 static void rotating(float pitch, float yaw);
 
 static void pause();
+
+static void test();
