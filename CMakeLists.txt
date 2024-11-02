@@ -70,13 +70,15 @@ foreach(ex IN LISTS Examples)
         "engine/utils/ObjContainer.c"    
         "engine/object/Camera.h" 
         "engine/object/Camera.c" 
+        "engine/object/component/Component.h"
+        "engine/object/component/Component.c"
         "engine/ui/DebugText.h"
         "engine/ui/DebugText.c" 
         "engine/utils/String.h"
         "engine/utils/String.c" 
         "engine/utils/Shapes.c"
 
-      "code/object/Triangle.h" "code/object/Triangle.c")
+      "code/object/Triangle.h" "code/object/Triangle.c" "engine/object/utils.h" "engine/object/utils.c" "engine/object/component/CollisionShape.h" "engine/object/component/CollisionShape.c")
     target_link_libraries(${ex} PRIVATE GLUT::GLUT)
 
     if (CMAKE_SYSTEM_NAME STREQUAL "Linux")

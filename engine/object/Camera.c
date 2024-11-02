@@ -36,14 +36,16 @@ Camera* newCamera() {
 	return cam;
 }
 
-void camReady(Camera* cam) {
+void camReady(Object* obj) {
+	Camera* cam = cast(obj, CAMERA);
 	glm_vec3_copy((vec3) { 0.0f, 0.0f, 3.0f }, cam->camPosition);
 	glm_vec3_copy((vec3) { 0.0f, 0.0f, -1.0f }, cam->camFront);
 	glm_vec3_copy((vec3) { 0.0f, 1.0f, 0.0f }, cam->camUp);
 	glm_vec3_copy((vec3) { 0.0f, -90.0f, 0.0f }, cam->camRot);
 }
 
-void camUpdate(Camera* cam, float deltatime) {
+void camUpdate(Object* obj, float deltatime) {
+	Camera* cam = cast(obj, CAMERA);
 	cam->camRot[0] = fmod(cam->camRot[0], 360.0f);
 	cam->camRot[1] = fmod(cam->camRot[1], 360.0f);
 	cam->camRot[2] = fmod(cam->camRot[2], 360.0f);
@@ -81,7 +83,8 @@ void camUpdate(Camera* cam, float deltatime) {
 	cam->yawVal *= cam->fraction;
 }
 
-void camRender(Camera* cam) {
+void camRender(Object* obj) {
+	Camera* cam = cast(obj, CAMERA);
 	mat4 mirrorXZ;
 	glm_mat4_identity(mirrorXZ);
 	mirrorXZ[0][0] = -1;

@@ -8,11 +8,11 @@ ObjContainer* newObjContainer() {
 
 	c->size = OC_DEFAULT_SIZE;
 	c->end = 0;
-	c->list = (Object**)malloc(sizeof(Object*) * c->size);
+	c->list = (void**)malloc(sizeof(void*) * c->size);
 	return c;
 }
 
-int ocPushBack(ObjContainer* c, Object* obj) {
+int ocPushBack(ObjContainer* c, void* obj) {
 	if (c == NULL) return -2;
 
 	if (c->size == c->end) {
@@ -23,7 +23,7 @@ int ocPushBack(ObjContainer* c, Object* obj) {
 	return 1;
 }
 
-int ocRemove(ObjContainer* c, Object* target) {
+int ocRemove(ObjContainer* c, void* target) {
 	if (c == NULL) return -2;
 
 	int k = 0;
@@ -54,7 +54,7 @@ unsigned ocSize(ObjContainer* container) {
 
 int doubleSize(ObjContainer* c) {
 	unsigned dsize = c->size << 1;
-	Object** tmp = (Object**)realloc(c->list, sizeof(Object*) * dsize);
+	void** tmp = (void**)realloc(c->list, sizeof(void*) * dsize);
 	if (tmp == NULL) return -1;
 
 	c->list = tmp;
@@ -67,7 +67,7 @@ int divideSize(ObjContainer* c) {
 
 	if (dsize < 8) dsize = 8;
 
-	Object** tmp = (Object**)realloc(c->list, sizeof(Object*) * dsize);
+	void** tmp = (void**)realloc(c->list, sizeof(void*) * dsize);
 	if (tmp == NULL) return -1;
 
 	c->list = tmp;

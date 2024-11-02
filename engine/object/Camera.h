@@ -31,6 +31,6 @@ struct _cam {
 
 Camera* newCamera();
 
-static void camReady(Camera* cam);
-static void camUpdate(Camera* cam, float deltatime);
-static void camRender(Camera* cam);
+static void camReady(Object* obj);
+static void camUpdate(Object* obj, float deltatime);
+static void camRender(Object* obj);

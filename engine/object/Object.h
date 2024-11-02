@@ -3,23 +3,31 @@
 #include <GL/freeglut.h>
 #include <cglm/cglm.h>
 
-typedef int obj_type_t;
+#include "object/component/Component.h"
+#include "object/utils.h"
+#include "utils/ObjContainer.h"
 
-// Registered object type
-#define OBJECT    0
-#define CAMERA	  1
-#define TRIANGLE  2
-
-static int current_id = 0;
+static int obj_next_id = 0;
 
 typedef struct _obj Object;
 
 typedef struct _obj {
+	class_type_t check_code;
 	obj_type_t obj_type;
 	int id;
+	float movSpeed;
 	mat4 transform;
 
-	float movSpeed;
+	/* The child component of the object.
+	The owner object will render all the component in the list*/
+	ObjContainer* child_list;
+
+	/* The other object which attach to the object.
+	The object in the list won't be rendered by the owner object. */
+	ObjContainer* attach_list;
+
+	// This object is attached to the owner object
+	Object* owner;
 
 	void* inheritance;
 	
@@ -29,10 +37,13 @@ typedef struct _obj {
 };
 
 Object* newObject();
-Object* inheriteObj(void* self, int self_type);
+Object* inheriteObj(void* self, obj_type_t self_type);
 
-void* cast(Object* obj, obj_type_t type);
-
-static void objReady(Object* obj);
-static void objUpdate(Object* obj, float deltatime);
-static void objRender(Object* obj);
+void objReady(Object* obj);
+void objUpdateChild(Object* obj, float deltatime);
+void objRenderChild(Object* obj);
+void objAddChild(Object* owner, Component* child);
+void objRemoveChild(Object* owner, Component* target);
+void objAttachmentTo(Object* parent, Object* child);
+void objDeattachment(Object* parent, Object* target);
+void objGetWorldTransform(mat4 trans, Object* obj);

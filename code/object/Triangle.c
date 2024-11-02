@@ -18,11 +18,15 @@ Triangle* newTriangle() {
 
 void triUpdate(Object* tri, float deltatime) {
 	glm_rotate(tri->transform, -1.0f * deltatime, (vec3) { 0.0f, 1.0f, 0.0f });
+	objUpdateChild(tri, deltatime);
 }
 
 void triRender(Object* tri) {
 	glPushMatrix();
-	glMultMatrixf(tri->transform);
+	mat4 worldTrans;
+	objGetWorldTransform(worldTrans, tri);
+	glMultMatrixf(worldTrans);
 	drawTriangle();
+	objRenderChild(tri);
 	glPopMatrix();
 }
