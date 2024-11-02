@@ -12,9 +12,9 @@ Component* newComponent() {
 
     comp->inheritance = NULL;
 
-    comp->ready = compReady;
-    comp->update = compUpdate;
-    comp->render = compRender;
+    comp->ready = compReadyChild;
+    comp->update = compUpdateChild;
+    comp->render = compRenderChild;
 
     comp->check_code = generate_code(comp);
 
@@ -30,16 +30,26 @@ Component* inheriteComp(void* self, comp_type_t self_type) {
     comp->inheritance = self;
     comp->comp_type = self_type;
 
+    comp->check_code = generate_code(comp);
+
     return comp;
 }
 
-void compReady(Component* comp) {
+void compReadyChild(Component* comp) {
+    for (int i = 0; i < comp->child_list->end; i++) {
+        Component* child = cast(comp->child_list->list[i], COMPONENT);
+        child->ready(child);
+    }
 }
 
-void compUpdate(Component* comp, float deltatime) {
+void compUpdateChild(Component* comp, float deltatime) {
+    for (int i = 0; i < comp->child_list->end; i++) {
+        Component* child = cast(comp->child_list->list[i], COMPONENT);
+        child->update(child, deltatime);
+    }
 }
 
-void compRender(Component* comp) {
+void compRenderChild(Component* comp) {
     for (int i = 0; i < comp->child_list->end; i++) {
         Component* child = cast(comp->child_list->list[i], COMPONENT);
         child->render(child);

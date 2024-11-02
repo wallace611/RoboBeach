@@ -5,12 +5,27 @@
 #include "object/component/Component.h"
 #include "object/component/CollisionShape.h"
 #include "object/Triangle.h"
+#include "object/robot/Robot.h"
+#include "object/robot/components/BotBody.h"
 
 int generate_code(void* pt) {
-	Object* obj = (Object*) pt;
-	int id = obj->id;
-	int value = obj->obj_type;
-	char combined[256];
+	if (pt == NULL) return -1;
+	int* tmp = (int*)pt;
+
+	int id, value;
+
+	if (tmp[1] <= 1024) {
+		Object* obj = (Object*)pt;
+		id = obj->id;
+		value = obj->obj_type;
+	}
+	else {
+		Component* comp = (Component*)pt;
+		id = comp->id;
+		value = comp->comp_type;
+	}
+
+	char combined[32];
 	snprintf(combined, sizeof(combined), "%d%d", id, value);
 
 	int total = 0;
@@ -57,6 +72,12 @@ void* obj_casting(void* pt, obj_type_t type) {
 			return up;
 		}
 		break;
+
+	case ROBOT:
+		if (((Robot*)up)->obj_type == ROBOT) {
+			return up;
+		}
+		break;
 	}
 	return NULL;
 }
@@ -74,6 +95,12 @@ void* comp_casting(void* pt, comp_type_t type) {
 
 	case COLLISION:
 		if (((CollisionShape*)up)->comp_type == COLLISION) {
+			return up;
+		}
+		break;
+
+	case BOT_BODY:
+		if (((BotBody*)up)->comp_type == BOT_BODY) {
 			return up;
 		}
 		break;

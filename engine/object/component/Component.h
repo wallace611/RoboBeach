@@ -22,13 +22,13 @@ struct _comp {
 	void* inheritance;
 
 	void (*ready) (Component* comp);
-	void (*update) (Component* comp);
+	void (*update) (Component* comp, float deltatime);
 	void (*render) (Component* comp);
 };
 
 Component* newComponent();
 Component* inheriteComp(void* self, comp_type_t self_type);
 
-void compReady(Component* comp);
-void compUpdate(Component* comp, float deltatime);
-void compRender(Component* comp);
+void compReadyChild(Component* comp);
+void compUpdateChild(Component* comp, float deltatime);
+void compRenderChild(Component* comp);

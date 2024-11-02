@@ -7,6 +7,10 @@ CollisionShape* newCollisionShape() {
 	cs->comp_type = COLLISION;
 	cs->comp = inheriteComp(cs, COLLISION);
 
+	cs->comp->ready = csReady;
+	cs->comp->update = csUpdate;
+	cs->comp->render = csRender;
+
 	return cs;
 }
 

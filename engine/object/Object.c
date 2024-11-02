@@ -41,21 +41,21 @@ Object* inheriteObj(void* self, obj_type_t self_type) {
 
 void objReady(Object* obj) {
 	for (int i = 0; i < obj->child_list->end; i++) {
-		Object* child = cast(obj->child_list->list[i], OBJECT);
+		Component* child = cast(obj->child_list->list[i], COMPONENT);
 		child->ready(child);
 	}
 }
 
 void objUpdateChild(Object* obj, float deltatime) {
 	for (int i = 0; i < obj->child_list->end; i++) {
-		Object* child = cast(obj->child_list->list[i], OBJECT);
+		Component* child = cast(obj->child_list->list[i], COMPONENT);
 		child->update(child, deltatime);
 	}
 }
 
 void objRenderChild(Object* obj) {
 	for (int i = 0; i < obj->child_list->end; i++) {
-		Object* child = cast(obj->child_list->list[i], OBJECT);
+		Component* child = cast(obj->child_list->list[i], COMPONENT);
 		child->render(child);
 	}
 }

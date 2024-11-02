@@ -4,6 +4,7 @@
 #include "object/Object.h"
 #include "utils/String.h"
 #include "code/object/Triangle.h"
+#include "code/object/robot/Robot.h"
 
 #include <stdio.h>
 
@@ -20,6 +21,9 @@ int main(int argc, char** argv) {
 	glm_translate(t2->obj->transform, (vec3) { 2.0f, 2.0f, 0.0f });
 	worldSpawnObj(world, t2->obj);
 	objAttachmentTo(t1->obj, t2->obj);
+
+	Robot* r = newRobot();
+	worldSpawnObj(world, r->obj);
 
 	engineStartLoop();
 
