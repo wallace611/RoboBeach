@@ -43,6 +43,7 @@ find_package(GLUT REQUIRED)
 find_package(cglm REQUIRED)
 
 include_directories(${CMAKE_SOURCE_DIR}/engine)
+include_directories(${CMAKE_SOURCE_DIR}/code)
 
 set(Examples
     "RoboBeach"

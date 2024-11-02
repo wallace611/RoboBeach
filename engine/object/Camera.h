@@ -5,6 +5,8 @@
 typedef struct _cam Camera;
 
 struct _cam {
+	obj_type_t obj_type;
+
 	float fov;
 	float zNear;
 	float zFar;

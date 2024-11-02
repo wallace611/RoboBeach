@@ -40,6 +40,7 @@ void engineInit(int* argc, char** argv) {
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
+	glEnable(GLUT_MULTISAMPLE);
 
 	glutDisplayFunc(displayCallback);
 	glutIdleFunc(idleCallback);
@@ -197,5 +198,6 @@ void pause() {
 	else {
 		glutSetCursor(GLUT_CURSOR_LEFT_ARROW);
 		is_paused = !is_paused;
+		allowMouseMotion = 0;
 	}
 }

@@ -8,6 +8,7 @@ Camera* newCamera() {
 	Camera* cam = (Camera*)malloc(sizeof(Camera));
 	if (cam == NULL) return NULL;
 
+	cam->obj_type = CAMERA;
 	cam->fov = 60.0f;
 	cam->zNear = 0.9f;
 	cam->zFar = 1000.0f;
@@ -22,7 +23,7 @@ Camera* newCamera() {
 
 	cam->fraction = 0.9f;
 
-	cam->obj = inheriteObject();
+	cam->obj = inheriteObj(cam, cam->obj_type);
 	if (cam->obj == NULL) return NULL;
 
 	cam->obj->obj_type = CAMERA;
