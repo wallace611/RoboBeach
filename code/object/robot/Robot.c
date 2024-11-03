@@ -13,6 +13,7 @@ Robot* newRobot() {
 	bot->bbody = newBotBody();
 	if (bot->bbody == NULL) return NULL;
 	ocPushBack(bot->obj->child_list, bot->bbody->comp);
+	glm_translate(bot->bbody->comp->transform, (vec3) { .0f, .5f, .0f });
 
 	bot->obj->ready = botReady;
 	bot->obj->update = botUpdate;
@@ -21,16 +22,19 @@ Robot* newRobot() {
 	return bot;
 }
 
-void botReady(Object* bot) {
+void botReady(Object* obj) {
+	objReady(obj);
 }
 
-void botUpdate(Object* bot, float deltatime) {
+void botUpdate(Object* obj, float deltatime) {
+	objUpdateChild(obj, deltatime);
 }
 
-void botRender(Object* bot) {
+void botRender(Object* obj) {
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
-	glMultMatrixf(bot->transform);
-	objRenderChild(bot);
+	glMultMatrixf(obj->transform);
+
+	objRenderChild(obj);
 	glPopMatrix();
 }

@@ -11,7 +11,7 @@ static int obj_next_id = 0;
 
 typedef struct _obj Object;
 
-typedef struct _obj {
+struct _obj {
 	class_type_t check_code;
 	obj_type_t obj_type;
 	int id;

@@ -16,7 +16,7 @@ Component* newComponent() {
     comp->update = compUpdateChild;
     comp->render = compRenderChild;
 
-    comp->check_code = generate_code(comp);
+    comp->check_code = generate_checkcode(comp);
 
     return comp;
 }
@@ -30,7 +30,7 @@ Component* inheriteComp(void* self, comp_type_t self_type) {
     comp->inheritance = self;
     comp->comp_type = self_type;
 
-    comp->check_code = generate_code(comp);
+    comp->check_code = generate_checkcode(comp);
 
     return comp;
 }

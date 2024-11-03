@@ -23,7 +23,7 @@ Object* newObject() {
 	obj->update = objUpdateChild;
 	obj->render = objRenderChild;
 
-	obj->check_code = generate_code(obj);
+	obj->check_code = generate_checkcode(obj);
 	return obj;
 }
 
@@ -35,7 +35,7 @@ Object* inheriteObj(void* self, obj_type_t self_type) {
 	obj->obj_type = self_type;
 	obj->inheritance = self;
 
-	obj->check_code = generate_code(obj);
+	obj->check_code = generate_checkcode(obj);
 	return obj;
 }
 

@@ -85,12 +85,11 @@ void camUpdate(Object* obj, float deltatime) {
 
 void camRender(Object* obj) {
 	Camera* cam = cast(obj, CAMERA);
-	mat4 mirrorXZ;
-	glm_mat4_identity(mirrorXZ);
-	mirrorXZ[0][0] = -1;
-	mirrorXZ[2][2] = -1;
+	mat4 mirrorZ;
+	glm_mat4_identity(mirrorZ);
+	mirrorZ[2][2] = -1;
 
 	mat4 ttmp;
-	glm_mat4_mul(cam->obj->transform, mirrorXZ, ttmp);
+	glm_mat4_mul(cam->obj->transform, mirrorZ, ttmp);
 	glMultMatrixf(ttmp);
 }

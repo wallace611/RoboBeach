@@ -15,6 +15,6 @@ struct _bot {
 
 Robot* newRobot();
 
-static void botReady(Object* bot);
-static void botUpdate(Object* bot, float deltatime);
-static void botRender(Object* bot);
+static void botReady(Object* obj);
+static void botUpdate(Object* obj, float deltatime);
+static void botRender(Object* obj);
