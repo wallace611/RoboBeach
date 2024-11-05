@@ -5,11 +5,11 @@
 typedef struct _conn Connector;
 
 struct _conn {
-	comp_type_t comp_type;
+	comp_type_t obj_type;
 
-	Component* comp;
+	Component* obj;
 
-	unsigned char isVisible;
+	unsigned char bIsVisible;
 
 	Component* parent;
 	Component* child;
@@ -17,6 +17,6 @@ struct _conn {
 
 Connector* newConnector(Component* child);
 
-void connReady(Component* comp);
-void connUpdate(Component* comp, float deltatime);
-void connRender(Component* comp);
+void connReady(Component* obj);
+void connUpdate(Component* obj, float deltatime);
+void connRender(Component* obj);

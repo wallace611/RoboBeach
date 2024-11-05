@@ -18,10 +18,11 @@ Camera* newCamera() {
 	cam->pitchVal = 0.0f;
 	cam->yawVal = 0.0f;
 
-	cam->pitchSensitivity = 2.0f;
-	cam->yawSensitivity = 2.0f;
+	cam->pitchSensitivity = 3.0f;
+	cam->yawSensitivity = 3.0f;
 
-	cam->fraction = 0.9f;
+	cam->moveFraction = 0.9f;
+	cam->rotateFraction = 0.9f;
 
 	cam->obj = inheriteObj(cam, cam->obj_type);
 	if (cam->obj == NULL) return NULL;
@@ -45,6 +46,9 @@ void camReady(Object* obj) {
 }
 
 void camUpdate(Object* obj, float deltatime) {
+	mat4 worldTrans;
+	objGetWorldTransform(worldTrans, obj);
+
 	Camera* cam = cast(obj, CAMERA);
 	cam->camRot[0] = fmod(cam->camRot[0], 360.0f);
 	cam->camRot[1] = fmod(cam->camRot[1], 360.0f);
@@ -77,10 +81,10 @@ void camUpdate(Object* obj, float deltatime) {
 
 	glm_lookat(cam->camPosition, frontPos, cam->camUp, cam->obj->transform);
 
-	cam->forwardVal *= cam->fraction;
-	cam->sideVal *= cam->fraction;
-	cam->pitchVal *= cam->fraction;
-	cam->yawVal *= cam->fraction;
+	cam->forwardVal *= cam->moveFraction;
+	cam->sideVal *= cam->moveFraction;
+	cam->pitchVal *= cam->rotateFraction;
+	cam->yawVal *= cam->rotateFraction;
 }
 
 void camRender(Object* obj) {

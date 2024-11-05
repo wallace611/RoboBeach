@@ -1,57 +1,57 @@
 #include "Component.h"
 
 Component* newComponent() {
-    Component* comp = (Component*)malloc(sizeof(Component));
-    if (comp == NULL) return NULL;
+    Component* obj = (Component*)malloc(sizeof(Component));
+    if (obj == NULL) return NULL;
 
-    comp->comp_type = COMPONENT;
-    comp->id = comp_next_id++;
-    glm_mat4_identity(comp->transform);
+    obj->obj_type = COMPONENT;
+    obj->id = comp_next_id++;
+    glm_mat4_identity(obj->transform);
 
-    comp->child_list = newObjContainer();
+    obj->child_list = newObjContainer();
 
-    comp->inheritance = NULL;
+    obj->inheritance = NULL;
 
-    comp->ready = compReadyChild;
-    comp->update = compUpdateChild;
-    comp->render = compRenderChild;
+    obj->ready = compReadyChild;
+    obj->update = compUpdateChild;
+    obj->render = compRenderChild;
 
-    comp->check_code = generate_checkcode(comp);
+    obj->check_code = generate_checkcode(obj);
 
-    return comp;
+    return obj;
 }
 
 Component* inheriteComp(void* self, comp_type_t self_type) {
     if (self == NULL) return NULL;
 
-    Component* comp = newComponent();
-    if (comp == NULL) return NULL;
+    Component* obj = newComponent();
+    if (obj == NULL) return NULL;
 
-    comp->inheritance = self;
-    comp->comp_type = self_type;
+    obj->inheritance = self;
+    obj->obj_type = self_type;
 
-    comp->check_code = generate_checkcode(comp);
+    obj->check_code = generate_checkcode(obj);
 
-    return comp;
+    return obj;
 }
 
-void compReadyChild(Component* comp) {
-    for (int i = 0; i < comp->child_list->end; i++) {
-        Component* child = cast(comp->child_list->list[i], COMPONENT);
+void compReadyChild(Component* obj) {
+    for (int i = 0; i < obj->child_list->end; i++) {
+        Component* child = cast(obj->child_list->list[i], COMPONENT);
         child->ready(child);
     }
 }
 
-void compUpdateChild(Component* comp, float deltatime) {
-    for (int i = 0; i < comp->child_list->end; i++) {
-        Component* child = cast(comp->child_list->list[i], COMPONENT);
+void compUpdateChild(Component* obj, float deltatime) {
+    for (int i = 0; i < obj->child_list->end; i++) {
+        Component* child = cast(obj->child_list->list[i], COMPONENT);
         child->update(child, deltatime);
     }
 }
 
-void compRenderChild(Component* comp) {
-    for (int i = 0; i < comp->child_list->end; i++) {
-        Component* child = cast(comp->child_list->list[i], COMPONENT);
+void compRenderChild(Component* obj) {
+    for (int i = 0; i < obj->child_list->end; i++) {
+        Component* child = cast(obj->child_list->list[i], COMPONENT);
         child->render(child);
     }
 }

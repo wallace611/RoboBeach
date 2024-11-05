@@ -4,32 +4,33 @@ BotBody* newBotBody() {
 	BotBody* bbody = (BotBody*)malloc(sizeof(BotBody));
 	if (bbody == NULL) return NULL;
 
-	bbody->comp_type = BOT_BODY;
+	bbody->obj_type = BOT_BODY;
 
-	bbody->comp = inheriteComp(bbody, BOT_BODY);
-	if (bbody->comp == NULL) return NULL;
+	bbody->obj = inheriteComp(bbody, BOT_BODY);
+	if (bbody->obj == NULL) return NULL;
 	
 	build_body_part(bbody);
 
-	bbody->comp->update = bbodyUpdate;
-	bbody->comp->render = bbodyRender;
+	bbody->obj->update = bbodyUpdate;
+	bbody->obj->render = bbodyRender;
 
 	return bbody;
 }
 
-void bbodyUpdate(Component* comp, float deltatime) {
-	BotBody* body = cast(comp, BOT_BODY);
-	glm_rotate(body->rightFArmConnector->comp->transform, 2 * deltatime, (vec3) { 1.0f, 0.0f, 0.0f });
-	glm_rotate(body->rightArmConnector->comp->transform, 2 * deltatime, (vec3) { 1.0f, 0.0f, 0.0f });
-	glm_rotate(body->leftFArmConnector->comp->transform, -2 * deltatime, (vec3) { 1.0f, 0.0f, 0.0f });
-	glm_rotate(body->leftArmConnector->comp->transform, -2 * deltatime, (vec3) { 1.0f, 0.0f, 0.0f });
+void bbodyUpdate(Component* obj, float deltatime) {
+	BotBody* body = cast(obj, BOT_BODY);
+	glm_rotate(body->headConnector->obj->transform, 2 * deltatime, (vec3) { 0.0f, 1.0f, 0.0f });
+	glm_rotate(body->rightFArmConnector->obj->transform, 2 * deltatime, (vec3) { 1.0f, 0.0f, 0.0f });
+	glm_rotate(body->rightArmConnector->obj->transform, 2 * deltatime, (vec3) { 1.0f, 0.0f, 0.0f });
+	glm_rotate(body->leftFArmConnector->obj->transform, -2 * deltatime, (vec3) { 1.0f, 0.0f, 0.0f });
+	glm_rotate(body->leftArmConnector->obj->transform, -2 * deltatime, (vec3) { 1.0f, 0.0f, 0.0f });
 
 }
 
-void bbodyRender(Component* comp) {
+void bbodyRender(Component* obj) {
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
-	glMultMatrixf(comp->transform);
+	glMultMatrixf(obj->transform);
 
 	// body
 	glPushMatrix();
@@ -103,7 +104,7 @@ void bbodyRender(Component* comp) {
 	glutSolidCylinder(.07, .3, 10, 10);
 	glPopMatrix();
 
-	compRenderChild(comp);
+	compRenderChild(obj);
 	glPopMatrix();
 }
 
@@ -111,93 +112,93 @@ void build_body_part(BotBody* bbody) {
 	// head
 	BotHead* head = bbody->bhead = newBotHead();
 	if (head == NULL) return NULL;
-	Connector* headCon = bbody->headConnector = newConnector(head->comp);
+	Connector* headCon = bbody->headConnector = newConnector(head->obj);
 	if (headCon == NULL) return NULL;
-	ocPushBack(bbody->comp->child_list, headCon->comp);
-	glm_translate(headCon->comp->transform, (vec3) { .0f, .5f, .0f });
-	glm_translate(head->comp->transform, (vec3) { .0f, .35f, .0f });
-	printf("head: %d\nheadCon: %d\n", head->comp->id, headCon->comp->id);
+	ocPushBack(bbody->obj->child_list, headCon->obj);
+	glm_translate(headCon->obj->transform, (vec3) { .0f, .5f, .0f });
+	glm_translate(head->obj->transform, (vec3) { .0f, .35f, .0f });
+	//printf("head: %d\nheadCon: %d\n", head->comp->id, headCon->comp->id);
 
 	// right forearm
 	BotArm* rightFArm = bbody->rightFArm = newBotArm();
 	if (rightFArm == NULL) return NULL;
-	Connector* rFArmCon = bbody->rightFArmConnector = newConnector(rightFArm->comp);
+	Connector* rFArmCon = bbody->rightFArmConnector = newConnector(rightFArm->obj);
 	if (rFArmCon == NULL) return NULL;
-	ocPushBack(bbody->comp->child_list, rFArmCon->comp);
-	glm_translate(rFArmCon->comp->transform, (vec3) { .5f, .5f, .0f });
-	glm_translate(rightFArm->comp->transform, (vec3) { .15f, .0f, .0f });
-	glm_scale(rightFArm->comp->transform, (vec3) { .7f, .8f, .7f });
-	printf("rightFArm: %d\nrFArmCon: %d\n", rightFArm->comp->id, rFArmCon->comp->id);
+	ocPushBack(bbody->obj->child_list, rFArmCon->obj);
+	glm_translate(rFArmCon->obj->transform, (vec3) { .5f, .5f, .0f });
+	glm_translate(rightFArm->obj->transform, (vec3) { .15f, .0f, .0f });
+	glm_scale(rightFArm->obj->transform, (vec3) { .7f, .8f, .7f });
+	//printf("rightFArm: %d\nrFArmCon: %d\n", rightFArm->comp->id, rFArmCon->comp->id);
 
 	// left forearm
 	BotArm* leftFArm = bbody->leftFArm = newBotArm();
 	if (leftFArm == NULL) return NULL;
-	Connector* lFArmCon = bbody->leftFArmConnector = newConnector(leftFArm->comp);
+	Connector* lFArmCon = bbody->leftFArmConnector = newConnector(leftFArm->obj);
 	if (lFArmCon == NULL) return NULL;
-	ocPushBack(bbody->comp->child_list, lFArmCon->comp);
-	glm_translate(lFArmCon->comp->transform, (vec3) { -.5f, .5f, .0f });
-	glm_translate(leftFArm->comp->transform, (vec3) { -.15f, .0f, .0f });
-	glm_scale(leftFArm->comp->transform, (vec3) { .7f, .8f, .7f });
-	printf("leftFArm: %d\nlFArmCon: %d\n", leftFArm->comp->id, lFArmCon->comp->id);
+	ocPushBack(bbody->obj->child_list, lFArmCon->obj);
+	glm_translate(lFArmCon->obj->transform, (vec3) { -.5f, .5f, .0f });
+	glm_translate(leftFArm->obj->transform, (vec3) { -.15f, .0f, .0f });
+	glm_scale(leftFArm->obj->transform, (vec3) { .7f, .8f, .7f });
+	//printf("leftFArm: %d\nlFArmCon: %d\n", leftFArm->comp->id, lFArmCon->comp->id);
 
 	// right arm
 	BotArm* rightArm = bbody->rightArm = newBotArm();
 	if (rightArm == NULL) return NULL;
-	Connector* rArmCon = bbody->rightArmConnector = newConnector(rightArm->comp);
+	Connector* rArmCon = bbody->rightArmConnector = newConnector(rightArm->obj);
 	if (rArmCon == NULL) return NULL;
-	rArmCon->isVisible = 1;
-	ocPushBack(rightFArm->comp->child_list, rArmCon->comp);
-	glm_translate(rArmCon->comp->transform, (vec3) { .0f, -.85f, .0f });
-	printf("rightArm: %d\nrArmCon: %d\n", rightArm->comp->id, rArmCon->comp->id);
+	rArmCon->bIsVisible = 1;
+	ocPushBack(rightFArm->obj->child_list, rArmCon->obj);
+	glm_translate(rArmCon->obj->transform, (vec3) { .0f, -.85f, .0f });
+	//printf("rightArm: %d\nrArmCon: %d\n", rightArm->comp->id, rArmCon->comp->id);
 
 	// left arm
 	BotArm* leftArm = bbody->leftArm = newBotArm();
 	if (leftArm == NULL) return NULL;
-	Connector* lArmCon = bbody->leftArmConnector = newConnector(leftArm->comp);
+	Connector* lArmCon = bbody->leftArmConnector = newConnector(leftArm->obj);
 	if (lArmCon == NULL) return NULL;
-	lArmCon->isVisible = 1;
-	ocPushBack(leftFArm->comp->child_list, lArmCon->comp);
-	glm_translate(lArmCon->comp->transform, (vec3) { .0f, -.85f, .0f });
-	printf("leftArm: %d\nlArmCon: %d\n", leftArm->comp->id, lArmCon->comp->id);
+	lArmCon->bIsVisible = 1;
+	ocPushBack(leftFArm->obj->child_list, lArmCon->obj);
+	glm_translate(lArmCon->obj->transform, (vec3) { .0f, -.85f, .0f });
+	//printf("leftArm: %d\nlArmCon: %d\n", leftArm->comp->id, lArmCon->comp->id);
 
 	// right thigh
 	BotArm* rThigh = bbody->rightThigh = newBotArm();
 	if (rThigh == NULL) return NULL;
-	Connector* rThCon = bbody->rightThighConnector = newConnector(rThigh->comp);
+	Connector* rThCon = bbody->rightThighConnector = newConnector(rThigh->obj);
 	if (rThCon == NULL) return NULL;
-	ocPushBack(bbody->comp->child_list, rThCon->comp);
-	glm_translate(rThCon->comp->transform, (vec3) { .25f, -.5f, .0f });
-	glm_scale(rThigh->comp->transform, (vec3) { .8f, .8f, .8f });
-	printf("rThigh: %d\nrThCon: %d\n", rThigh->comp->id, rThCon->comp->id);
+	ocPushBack(bbody->obj->child_list, rThCon->obj);
+	glm_translate(rThCon->obj->transform, (vec3) { .25f, -.5f, .0f });
+	glm_scale(rThigh->obj->transform, (vec3) { .8f, .8f, .8f });
+	//printf("rThigh: %d\nrThCon: %d\n", rThigh->comp->id, rThCon->comp->id);
 	
 	// left thigh
 	BotArm* lThigh = bbody->leftThigh = newBotArm();
 	if (lThigh == NULL) return NULL;
-	Connector* lThCon = bbody->leftThighConnector = newConnector(lThigh->comp);
+	Connector* lThCon = bbody->leftThighConnector = newConnector(lThigh->obj);
 	if (lThCon == NULL) return NULL;
-	ocPushBack(bbody->comp->child_list, lThCon->comp);
-	glm_translate(lThCon->comp->transform, (vec3) { -.25f, -.5f, .0f });
-	glm_scale(lThigh->comp->transform, (vec3) { .8f, .8f, .8f });
-	printf("lThigh: %d\nlThCon: %d\n", lThigh->comp->id, lThCon->comp->id);
+	ocPushBack(bbody->obj->child_list, lThCon->obj);
+	glm_translate(lThCon->obj->transform, (vec3) { -.25f, -.5f, .0f });
+	glm_scale(lThigh->obj->transform, (vec3) { .8f, .8f, .8f });
+	//printf("lThigh: %d\nlThCon: %d\n", lThigh->comp->id, lThCon->comp->id);
 
 	// right calf
 	BotArm* rCalf = bbody->rightCalf = newBotArm();
 	if (rCalf == NULL) return NULL;
-	Connector* rCaCon = bbody->rightCalfConnector = newConnector(rCalf->comp);
+	Connector* rCaCon = bbody->rightCalfConnector = newConnector(rCalf->obj);
 	if (rCaCon == NULL) return NULL;
-	rCaCon->isVisible = 1;
-	ocPushBack(rThigh->comp->child_list, rCaCon->comp);
-	glm_translate(rCaCon->comp->transform, (vec3) { .0f, -.7f, .0f });
-	printf("rCalf: %d\nrCaCon: %d\n", rCalf->comp->id, rCaCon->comp->id);
+	rCaCon->bIsVisible = 1;
+	ocPushBack(rThigh->obj->child_list, rCaCon->obj);
+	glm_translate(rCaCon->obj->transform, (vec3) { .0f, -.8f, .0f });
+	//printf("rCalf: %d\nrCaCon: %d\n", rCalf->comp->id, rCaCon->comp->id);
 	
 	// left calf
 	BotArm* lCalf = bbody->leftCalf = newBotArm();
 	if (lCalf == NULL) return NULL;
-	Connector* lCaCon = bbody->leftCalfConnector = newConnector(lCalf->comp);
+	Connector* lCaCon = bbody->leftCalfConnector = newConnector(lCalf->obj);
 	if (lCaCon == NULL) return NULL;
-	lCaCon->isVisible = 1;
-	ocPushBack(lThigh->comp->child_list, lCaCon->comp);
-	glm_translate(lCaCon->comp->transform, (vec3) { .0f, -.7f, .0f });
-	printf("rCalf: %d\nrCaCon: %d\n", lCalf->comp->id, lCaCon->comp->id);
+	lCaCon->bIsVisible = 1;
+	ocPushBack(lThigh->obj->child_list, lCaCon->obj);
+	glm_translate(lCaCon->obj->transform, (vec3) { .0f, -.8f, .0f });
+	//printf("rCalf: %d\nrCaCon: %d\n", lCalf->comp->id, lCaCon->comp->id);
 
 }

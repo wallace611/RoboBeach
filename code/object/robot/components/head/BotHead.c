@@ -6,20 +6,23 @@ BotHead* newBotHead() {
 	BotHead* bhead = (BotHead*)malloc(sizeof(BotHead));
 	if (bhead == NULL) return NULL;
 
-	bhead->comp_type = BOT_HEAD;
-	bhead->comp = inheriteComp(bhead, BOT_HEAD);
-	if (bhead->comp == NULL) return NULL;
+	bhead->obj_type = BOT_HEAD;
+	bhead->obj = inheriteComp(bhead, BOT_HEAD);
+	if (bhead->obj == NULL) {
+		free(bhead);
+		return NULL;
+	}
 
-	bhead->comp->render = bheadRender;
+	bhead->obj->render = bheadRender;
 
 	return bhead;
 }
 
-void bheadRender(Component* comp) {
+void bheadRender(Component* obj) {
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 
-	glMultMatrixf(comp->transform);
+	glMultMatrixf(obj->transform);
 
 	glPushMatrix();
 	

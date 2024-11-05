@@ -1,6 +1,6 @@
 #pragma once
 
-#define OC_DEFAULT_SIZE 8
+#define OC_DEFAULT_SIZE 2
 
 typedef struct container {
 	size_t size;

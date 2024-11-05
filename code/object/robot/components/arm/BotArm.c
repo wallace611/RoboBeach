@@ -6,19 +6,22 @@ BotArm* newBotArm() {
 	BotArm* barm = (BotArm*)malloc(sizeof(BotArm));
 	if (barm == NULL) return NULL;
 
-	barm->comp_type = BOT_ARM;
-	barm->comp = inheriteComp(barm, BOT_ARM);
-	if (barm->comp == NULL) return NULL;
+	barm->obj_type = BOT_ARM;
+	barm->obj = inheriteComp(barm, BOT_ARM);
+	if (barm->obj == NULL) {
+		free(barm);
+		return NULL;
+	}
 
-	barm->comp->render = barmRender;
+	barm->obj->render = barmRender;
 
 	return barm;
 }
 
-void barmRender(Component* comp) {
+void barmRender(Component* obj) {
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
-	glMultMatrixf(comp->transform);
+	glMultMatrixf(obj->transform);
 	
 	glBegin(GL_QUADS);
 	{
@@ -61,7 +64,8 @@ void barmRender(Component* comp) {
 		glVertex3f(.2f, -.8f, .2f);
 	}
 	glEnd();
-	compRenderChild(comp);
+
+	compRenderChild(obj);
 
 	glPopMatrix();
 }

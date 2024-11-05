@@ -7,43 +7,43 @@ Connector* newConnector(Component* child) {
 	Connector* conn = (Connector*)malloc(sizeof(Connector));
 	if (conn == NULL) return NULL;
 
-	conn->isVisible = 0;
+	conn->bIsVisible = 0;
 
-	conn->comp_type = CONNECTOR;
-	conn->comp = inheriteComp(conn, CONNECTOR);
-	if (conn->comp == NULL) return NULL;
+	conn->obj_type = CONNECTOR;
+	conn->obj = inheriteComp(conn, CONNECTOR);
+	if (conn->obj == NULL) return NULL;
 
 	conn->child = child;
-	ocPushBack(conn->comp->child_list, child);
+	ocPushBack(conn->obj->child_list, child);
 
-	conn->comp->ready = connReady;
-	conn->comp->update = connUpdate;
-	conn->comp->render = connRender;
+	conn->obj->ready = connReady;
+	conn->obj->update = connUpdate;
+	conn->obj->render = connRender;
 
 	return conn;
 }
 
-void connReady(Component* comp) {
-	compReadyChild(comp);
+void connReady(Component* obj) {
+	compReadyChild(obj);
 }
 
-void connUpdate(Component* comp, float deltatime) {
-	compUpdateChild(comp, deltatime);
+void connUpdate(Component* obj, float deltatime) {
+	compUpdateChild(obj, deltatime);
 }
 
-void connRender(Component* comp) {
+void connRender(Component* obj) {
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
-	glMultMatrixf(comp->transform);
+	glMultMatrixf(obj->transform);
 
-	Connector* conn = cast(comp, CONNECTOR);
-	if (conn->isVisible) {
+	Connector* conn = cast(obj, CONNECTOR);
+	if (conn->bIsVisible) {
 		glPushMatrix();
 		glScalef(.1f, .1f, .1f);
 		drawUnitSphere(10, 10);
 		glPopMatrix();
 	}
 
-	compRenderChild(comp);
+	compRenderChild(obj);
 	glPopMatrix();
 }

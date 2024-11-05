@@ -8,7 +8,7 @@
 typedef struct _bbody BotBody;
 
 struct _bbody {
-	comp_type_t comp_type;
+	comp_type_t obj_type;
 
 	BotHead* bhead;
 	Connector* headConnector;
@@ -31,12 +31,12 @@ struct _bbody {
 	BotArm* leftCalf;
 	Connector* leftCalfConnector;
 
-	Component* comp;
+	Component* obj;
 };
 
 BotBody* newBotBody();
 
-void bbodyUpdate(Component* comp, float deltatime);
-void bbodyRender(Component* comp);
+void bbodyUpdate(Component* obj, float deltatime);
+void bbodyRender(Component* obj);
 
 static void build_body_part(BotBody* bbody);

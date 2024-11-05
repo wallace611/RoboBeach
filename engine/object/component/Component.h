@@ -12,7 +12,7 @@ typedef struct _comp Component;
 
 struct _comp {
 	class_type_t check_code;
-	comp_type_t comp_type;
+	comp_type_t obj_type;
 	int id;
 	mat4 transform;
 
@@ -21,14 +21,14 @@ struct _comp {
 
 	void* inheritance;
 
-	void (*ready) (Component* comp);
-	void (*update) (Component* comp, float deltatime);
-	void (*render) (Component* comp);
+	void (*ready) (Component* obj);
+	void (*update) (Component* obj, float deltatime);
+	void (*render) (Component* obj);
 };
 
 Component* newComponent();
 Component* inheriteComp(void* self, comp_type_t self_type);
 
-void compReadyChild(Component* comp);
-void compUpdateChild(Component* comp, float deltatime);
-void compRenderChild(Component* comp);
+void compReadyChild(Component* obj);
+void compUpdateChild(Component* obj, float deltatime);
+void compRenderChild(Component* obj);

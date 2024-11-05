@@ -3,13 +3,14 @@
 #include "object/Object.h"
 #include "object/Camera.h"
 #include "object/component/Component.h"
-#include "object/component/CollisionShape.h"
+#include "object/CollisionShape.h"
 #include "object/component/Connector.h"
 #include "object/Triangle.h"
 #include "object/robot/Robot.h"
 #include "object/robot/components/BotBody.h"
 #include "object/robot/components/head/BotHead.h"
 #include "object/robot/components/arm/BotArm.h"
+#include "object/Floor.h"
 
 int generate_checkcode(void* pt) {
 	if (pt == NULL) return -1;
@@ -23,9 +24,9 @@ int generate_checkcode(void* pt) {
 		value = obj->obj_type;
 	}
 	else {
-		Component* comp = (Component*)pt;
-		id = comp->id;
-		value = comp->comp_type;
+		Component* obj = (Component*)pt;
+		id = obj->id;
+		value = obj->obj_type;
 	}
 
 	char combined[32];
@@ -81,47 +82,53 @@ void* obj_casting(void* pt, obj_type_t type) {
 			return up;
 		}
 		break;
+
+	case COLLISION:
+		if (((CollisionShape*)up)->obj_type == COLLISION) {
+			return up;
+		}
+		break;
+	
+	case FLOOR:
+		if (((Floor*)up)->obj_type == FLOOR) {
+			return up;
+		}
+		break;
 	}
 	return NULL;
 }
 
 void* comp_casting(void* pt, comp_type_t type) {
-	Component* comp = (Component*)pt;
-	if (!is_checkcode_valid(comp, comp->check_code)) return NULL;
+	Component* obj = (Component*)pt;
+	if (!is_checkcode_valid(obj, obj->check_code)) return NULL;
 
-	void* up = comp->inheritance;
+	void* up = obj->inheritance;
 	if (up == NULL) return NULL;
 
 	switch (type) {
 	case COMPONENT:
-		return comp;
-
-	case COLLISION:
-		if (((CollisionShape*)up)->comp_type == COLLISION) {
-			return up;
-		}
-		break;
+		return obj;
 
 	case CONNECTOR:
-		if (((Connector*)up)->comp_type == CONNECTOR) {
+		if (((Connector*)up)->obj_type == CONNECTOR) {
 			return up;
 		}
 		break;
 
 	case BOT_BODY:
-		if (((BotBody*)up)->comp_type == BOT_BODY) {
+		if (((BotBody*)up)->obj_type == BOT_BODY) {
 			return up;
 		}
 		break;
 
 	case BOT_HEAD:
-		if (((BotHead*)up)->comp_type == BOT_HEAD) {
+		if (((BotHead*)up)->obj_type == BOT_HEAD) {
 			return up;
 		}
 		break;
 
 	case BOT_ARM:
-		if (((BotArm*)up)->comp_type == BOT_ARM) {
+		if (((BotArm*)up)->obj_type == BOT_ARM) {
 			return up;
 		}
 		break;

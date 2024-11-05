@@ -9,10 +9,11 @@ typedef int comp_type_t;
 #define CAMERA	  2
 #define TRIANGLE  3
 #define ROBOT	  4
+#define COLLISION 5
+#define FLOOR	  6
 
 // Registered component type > 1024
 #define COMPONENT 1025
-#define COLLISION 1026
 #define CONNECTOR 1027
 #define BOT_BODY  1028
 #define BOT_HEAD  1029

@@ -18,6 +18,10 @@ struct _obj {
 	float movSpeed;
 	mat4 transform;
 
+	vec3 vloc;
+	vec3 vrot;
+	vec3 vscl;
+
 	/* The child component of the object.
 	The owner object will render all the component in the list*/
 	ObjContainer* child_list;
@@ -39,7 +43,7 @@ struct _obj {
 Object* newObject();
 Object* inheriteObj(void* self, obj_type_t self_type);
 
-void objReady(Object* obj);
+void objReadyChild(Object* obj);
 void objUpdateChild(Object* obj, float deltatime);
 void objRenderChild(Object* obj);
 void objAddChild(Object* owner, Component* child);

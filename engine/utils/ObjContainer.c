@@ -36,16 +36,22 @@ int ocRemove(ObjContainer* c, void* target) {
 		c->list[i] = c->list[i + 1];
 	}
 	c->end -= 1;
-	if (c->end < (c->size >> 2) && c->size > 8) {
+	if (c->end < (c->size >> 2) && c->size > OC_DEFAULT_SIZE) {
 		divideSize(c);
 	}
 	return 1;	
 }
 
 int ocClear(ObjContainer* c) {
-	if (c == NULL) return -2;
+	if (c == NULL) return -1;
 
+	void** tmp = (void**)realloc(c->list, sizeof(void*) * OC_DEFAULT_SIZE);
+	if (tmp == NULL) return -1;
 
+	c->list = tmp;
+	c->size = OC_DEFAULT_SIZE;
+	c->end = 0;
+	return 1;
 }
 
 unsigned ocSize(ObjContainer* container) {

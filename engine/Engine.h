@@ -3,7 +3,7 @@
 #include "scene/World.h"
 #include "ui/DebugText.h"
 
-#define ENG_DEFAULT_FPS 60
+#define ENG_DEFAULT_FPS 100
 #define ENG_DEFAULT_WINDOW_WID 1200
 #define ENG_DEFAULT_WINDOW_HEI 700
 #define ENG_DEFAULT_WINDOW_POS_X 100

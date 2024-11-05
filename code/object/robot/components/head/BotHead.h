@@ -5,10 +5,10 @@
 typedef struct _bhead BotHead;
 
 struct _bhead {
-	comp_type_t comp_type;
+	comp_type_t obj_type;
 
-	Component* comp;
+	Component* obj;
 };
 
 BotHead* newBotHead();
-void bheadRender(Component* comp);
+void bheadRender(Component* obj);

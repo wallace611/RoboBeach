@@ -1,5 +1,6 @@
 #include "Triangle.h"
 
+#include "object/CollisionShape.h"
 #include "utils/Shapes.h"
 
 Triangle* newTriangle() {
@@ -17,6 +18,8 @@ Triangle* newTriangle() {
 }
 
 void triUpdate(Object* tri, float deltatime) {
+	mat4 tmp;
+	glm_mat4_copy(tri->transform, tmp);
 	glm_rotate(tri->transform, -1.0f * deltatime, (vec3) { 0.0f, 1.0f, 0.0f });
 	objUpdateChild(tri, deltatime);
 }

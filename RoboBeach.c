@@ -5,6 +5,7 @@
 #include "utils/String.h"
 #include "code/object/Triangle.h"
 #include "code/object/robot/Robot.h"
+#include "code/object/Floor.h"
 
 #include <stdio.h>
 
@@ -24,6 +25,10 @@ int main(int argc, char** argv) {
 
 	Robot* r = newRobot();
 	worldSpawnObj(world, r->obj);
+	glm_translate(r->obj->transform, (vec3) { 0.0f, 20.0f, 0.0f });
+
+	Floor* flr = newFloor();
+	worldSpawnObj(world, flr->obj);
 
 	engineStartLoop();
 

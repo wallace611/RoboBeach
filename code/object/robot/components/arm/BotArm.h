@@ -5,11 +5,11 @@
 typedef struct _barm BotArm;
 
 struct _barm {
-	comp_type_t comp_type;
+	comp_type_t obj_type;
 
-	Component* comp;
+	Component* obj;
 };
 
 BotArm* newBotArm();
 
-void barmRender(Component* comp);
+void barmRender(Component* obj);

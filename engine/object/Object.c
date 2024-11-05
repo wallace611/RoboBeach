@@ -11,6 +11,9 @@ Object* newObject() {
 	obj->obj_type = OBJECT;
 	obj->id = obj_next_id++;
 	glm_mat4_identity(obj->transform);
+	glm_vec3_zero(obj->vloc);
+	glm_vec3_zero(obj->vrot);
+	glm_vec3_one(obj->vscl);
 	obj->movSpeed = 1.0f;
 
 	obj->child_list = newObjContainer();
@@ -19,7 +22,7 @@ Object* newObject() {
 
 	obj->inheritance = NULL;
 
-	obj->ready = objReady;
+	obj->ready = objReadyChild;
 	obj->update = objUpdateChild;
 	obj->render = objRenderChild;
 
@@ -39,7 +42,7 @@ Object* inheriteObj(void* self, obj_type_t self_type) {
 	return obj;
 }
 
-void objReady(Object* obj) {
+void objReadyChild(Object* obj) {
 	for (int i = 0; i < obj->child_list->end; i++) {
 		Component* child = cast(obj->child_list->list[i], COMPONENT);
 		child->ready(child);

@@ -9,6 +9,8 @@
 #include "object/Camera.h"
 #include "object/Object.h"
 
+#include "../Test.h"
+
 void engineInit(int* argc, char** argv) {
 	target_delta_nano = (long long) 1e9 / ENG_DEFAULT_FPS;
 	current_fps = 0.0f;
@@ -27,8 +29,6 @@ void engineInit(int* argc, char** argv) {
 	worldSetCamera(world, cam);
 
 	objDebug = newDebugText();
-
-	ocPushBack(objDebug->objToShow, cam->obj);
 
 	glutInit(argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
@@ -53,6 +53,7 @@ void engineInit(int* argc, char** argv) {
 	imInit();
 	mappingKey();
 
+	test();
 	return 0;
 }
 
@@ -124,6 +125,9 @@ void tick(float deltatime) {
 		else if (timer - warp_time > deltatime) {
 			allowMouseMotion = 1;
 		}
+
+		// collision detection
+		worldCollisionDetection(world);
 	}
 
 	glutPostRedisplay();

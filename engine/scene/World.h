@@ -7,6 +7,7 @@
 typedef struct _world {
 	Camera* cam;
 	ObjContainer* instances;
+	ObjContainer* collisionList;
 } World;
 
 World* newWorld();
@@ -15,3 +16,4 @@ void worldRender(World* world);
 int worldSpawnObj(World* world, Object* obj);
 int worldKillObj(World* world, Object* obj);
 void worldSetCamera(World* world, Camera* cam);
+void worldCollisionDetection(World* world);
