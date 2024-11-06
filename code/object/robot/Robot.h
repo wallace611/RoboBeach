@@ -25,3 +25,5 @@ static void botReady(Object* obj);
 static void botUpdate(Object* obj, float deltatime);
 static void botRender(Object* obj);
 void botCollided(Object* self, CollisionShape* selfcs, Object* other, CollisionShape* othercs);
+
+void botCamUpdate(Object* obj, float deltatime);
