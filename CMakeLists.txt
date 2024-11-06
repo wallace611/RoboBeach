@@ -78,7 +78,7 @@ foreach(ex IN LISTS Examples)
         "engine/utils/String.c" 
         "engine/utils/Shapes.c"
 
-      "code/object/Triangle.h" "code/object/Triangle.c" "engine/object/utils.h" "engine/object/utils.c" "engine/object/CollisionShape.h" "engine/object/CollisionShape.c" "code/object/robot/Robot.h" "code/object/robot/Robot.c" "code/object/robot/components/BotBody.h" "code/object/robot/components/BotBody.c" "code/object/robot/components/head/BotHead.h" "code/object/robot/components/head/BotHead.c" "engine/object/component/Connector.h" "engine/object/component/Connector.c" "code/object/robot/components/arm/BotArm.h" "code/object/robot/components/arm/BotArm.c" "Test.h" "code/object/Floor.h" "code/object/Floor.c")
+      "code/object/Triangle.h" "code/object/Triangle.c" "engine/object/utils.h" "engine/object/utils.c" "engine/object/CollisionShape.h" "engine/object/CollisionShape.c" "code/object/robot/Robot.h" "code/object/robot/Robot.c" "code/object/robot/components/BotBody.h" "code/object/robot/components/BotBody.c" "code/object/robot/components/head/BotHead.h" "code/object/robot/components/head/BotHead.c" "engine/object/component/Connector.h" "engine/object/component/Connector.c" "code/object/robot/components/arm/BotArm.h" "code/object/robot/components/arm/BotArm.c" "Test.h" "code/object/Floor.h" "code/object/Floor.c" "engine/object/component/Animation.h" "engine/object/component/Animation.c")
     target_link_libraries(${ex} PRIVATE GLUT::GLUT)
 
     if (CMAKE_SYSTEM_NAME STREQUAL "Linux")

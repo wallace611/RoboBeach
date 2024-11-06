@@ -59,7 +59,7 @@ void rotating(float pitch, float yaw) {
 
 void jump() {
 	if (persp == RB_ROBOT) {
-		r->obj->vloc[1] += 5.0f;
+		botJump(r);
 	}
 }
 
@@ -115,6 +115,8 @@ int main(int argc, char** argv) {
 	glm_translate(r->obj->transform, (vec3) { 0.0f, 20.0f, 0.0f });
 
 	flr = newFloor();
+	glm_translate(flr->obj->transform, (vec3) { 0.0f, -2.0f, 0.0f });
+	glm_scale(flr->obj->transform, (vec3) { 100.0f, .1f, 100.0f });
 	worldSpawnObj(world, flr->obj);
 
 	worldCam = newCamera();

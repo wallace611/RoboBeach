@@ -8,8 +8,7 @@ BotBody* newBotBody() {
 
 	bbody->obj = inheriteComp(bbody, BOT_BODY);
 	if (bbody->obj == NULL) return NULL;
-	
-	build_body_part(bbody);
+		build_body_part(bbody);
 
 	bbody->obj->update = bbodyUpdate;
 	bbody->obj->render = bbodyRender;
@@ -19,12 +18,7 @@ BotBody* newBotBody() {
 
 void bbodyUpdate(Component* obj, float deltatime) {
 	BotBody* body = cast(obj, BOT_BODY);
-	glm_rotate(body->headConnector->obj->transform, 2 * deltatime, (vec3) { 0.0f, 1.0f, 0.0f });
-	glm_rotate(body->rightFArmConnector->obj->transform, 2 * deltatime, (vec3) { 1.0f, 0.0f, 0.0f });
-	glm_rotate(body->rightArmConnector->obj->transform, 2 * deltatime, (vec3) { 1.0f, 0.0f, 0.0f });
-	glm_rotate(body->leftFArmConnector->obj->transform, -2 * deltatime, (vec3) { 1.0f, 0.0f, 0.0f });
-	glm_rotate(body->leftArmConnector->obj->transform, -2 * deltatime, (vec3) { 1.0f, 0.0f, 0.0f });
-
+	
 }
 
 void bbodyRender(Component* obj) {
@@ -168,7 +162,7 @@ void build_body_part(BotBody* bbody) {
 	if (rThCon == NULL) return NULL;
 	ocPushBack(bbody->obj->child_list, rThCon->obj);
 	glm_translate(rThCon->obj->transform, (vec3) { .25f, -.5f, .0f });
-	glm_scale(rThigh->obj->transform, (vec3) { .8f, .8f, .8f });
+	glm_scale(rThigh->obj->transform, (vec3) { .9f, .9f, .9f });
 	//printf("rThigh: %d\nrThCon: %d\n", rThigh->comp->id, rThCon->comp->id);
 	
 	// left thigh
@@ -178,7 +172,7 @@ void build_body_part(BotBody* bbody) {
 	if (lThCon == NULL) return NULL;
 	ocPushBack(bbody->obj->child_list, lThCon->obj);
 	glm_translate(lThCon->obj->transform, (vec3) { -.25f, -.5f, .0f });
-	glm_scale(lThigh->obj->transform, (vec3) { .8f, .8f, .8f });
+	glm_scale(lThigh->obj->transform, (vec3) { .9f, .9f, .9f });
 	//printf("lThigh: %d\nlThCon: %d\n", lThigh->comp->id, lThCon->comp->id);
 
 	// right calf

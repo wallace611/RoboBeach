@@ -11,6 +11,7 @@
 #include "object/robot/components/head/BotHead.h"
 #include "object/robot/components/arm/BotArm.h"
 #include "object/Floor.h"
+#include "object/component/Animation.h"
 
 int generate_checkcode(void* pt) {
 	if (pt == NULL) return -1;
@@ -129,6 +130,12 @@ void* comp_casting(void* pt, comp_type_t type) {
 
 	case BOT_ARM:
 		if (((BotArm*)up)->obj_type == BOT_ARM) {
+			return up;
+		}
+		break;
+
+	case ANIMATION:
+		if (((Animation*)up)->obj_type == ANIMATION) {
 			return up;
 		}
 		break;

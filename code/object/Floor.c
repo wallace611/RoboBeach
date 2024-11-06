@@ -23,9 +23,6 @@ Floor* newFloor() {
 
 	worldSpawnObj(world, cs->obj);
 	objAttachmentTo(floor->obj, cs->obj);
-	
-	glm_translate(floor->obj->transform, (vec3) { 0.0f, -2.0f, 0.0f });
-	glm_scale(floor->obj->transform, (vec3) { 100.0f, .1f, 100.0f });
 
 	floor->obj->render = floorRender;
 
