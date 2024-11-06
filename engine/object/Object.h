@@ -19,6 +19,7 @@ struct _obj {
 	mat4 transform;
 
 	vec3 vloc;
+	vec3 aloc;
 	vec3 vrot;
 	vec3 vscl;
 

@@ -25,8 +25,6 @@ void engineInit(int* argc, char** argv) {
 	timer = 0.0;
 
 	world = newWorld();
-	Camera* cam = newCamera();
-	worldSetCamera(world, cam);
 
 	objDebug = newDebugText();
 
@@ -51,7 +49,6 @@ void engineInit(int* argc, char** argv) {
 	engineRenderInit();
 
 	imInit();
-	mappingKey();
 
 	test();
 	return 0;
@@ -91,19 +88,6 @@ float engineGetCurrentFPS() {
 
 double engineGetTimer() {
 	return timer;
-}
-
-void mappingKey() {
-	imMapFloat2Key('w', KEY_HOLD, moving, 1, 0);
-	imMapFloat2Key('s', KEY_HOLD, moving, -1, 0);
-	imMapFloat2Key('a', KEY_HOLD, moving, 0, -1);
-	imMapFloat2Key('d', KEY_HOLD, moving, 0, 1);
-	imMapFloat2Key('q', KEY_HOLD, rotating, 0, -1);
-	imMapFloat2Key('e', KEY_HOLD, rotating, 0, 1);
-	imMapFloat2Key('r', KEY_HOLD, rotating, 1, 0);
-	imMapFloat2Key('f', KEY_HOLD, rotating, -1, 0);
-	imMapFloat2Key(MOUSE_MOTION, NULL, rotating, 0, 0);
-	imMapActionKey(27, KEY_PRESS, pause);
 }
 
 void tick(float deltatime) {
@@ -179,16 +163,6 @@ void reshapeCallback(int w, int h) {
 
 	glViewport(0, 0, w, h);
 	glMatrixMode(GL_MODELVIEW);
-}
-
-void moving(float forward, float side) {
-	if (forward != 0) world->cam->forwardVal = forward;
-	if (side != 0) world->cam->sideVal = side;
-}
-
-void rotating(float pitch, float yaw) {
-	if (pitch != 0) world->cam->pitchVal += pitch;
-	if (yaw != 0) world->cam->yawVal += yaw;
 }
 
 void pause() {

@@ -2,11 +2,17 @@
 
 #include "object/Object.h"
 
+typedef int collision_channel_t;
+#define CC_DEFAULT		0
+#define CC_COLLISION	1
+#define CC_PICKUP		2
+
 typedef struct _collision CollisionShape;
 
 struct _collision {
 	comp_type_t obj_type;
 
+	collision_channel_t channel;
 	float width, height, depth;
 
 	float color[3];

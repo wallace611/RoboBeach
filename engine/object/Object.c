@@ -12,6 +12,7 @@ Object* newObject() {
 	obj->id = obj_next_id++;
 	glm_mat4_identity(obj->transform);
 	glm_vec3_zero(obj->vloc);
+	glm_vec3_zero(obj->aloc);
 	glm_vec3_zero(obj->vrot);
 	glm_vec3_one(obj->vscl);
 	obj->movSpeed = 1.0f;
@@ -77,6 +78,7 @@ void objAttachmentTo(Object* parent, Object* child) {
 }
 
 void objDeattachment(Object* parent, Object* target) {
+	if (parent == NULL || target == NULL) return;
 	ocRemove(parent->attach_list, target);
 	target->owner = NULL;
 }

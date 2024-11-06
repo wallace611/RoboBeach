@@ -38,7 +38,6 @@ void engineSetTargetFPS(unsigned fps);
 float engineGetCurrentFPS();
 double engineGetTimer();
 
-static void mappingKey();
 static void tick(float deltatime);
 
 // callback functions
@@ -46,7 +45,7 @@ static void displayCallback();
 static void idleCallback();
 static void reshapeCallback(int w, int h);
 
-static void moving(float x, float y);
-static void rotating(float pitch, float yaw);
+void moving(float x, float y);
+void rotating(float pitch, float yaw);
 
-static void pause();
+void pause();

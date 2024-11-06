@@ -5,6 +5,7 @@ CollisionShape* newCollisionShape() {
 	if (cs == NULL) return NULL;
 
 	cs->obj_type = COLLISION;
+    cs->channel = CC_DEFAULT;
 	cs->width = 1.0f;
 	cs->height = 1.0f;
 	cs->depth = 1.0f;
