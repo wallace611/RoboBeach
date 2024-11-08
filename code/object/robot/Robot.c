@@ -5,12 +5,16 @@
 #include "scene/World.h"
 #include "Engine.h"
 
+#include <stdlib.h>
+
 Robot* newRobot() {
 	Robot* bot = (Robot*)malloc(sizeof(Robot));
 	if (bot == NULL) return NULL;
 
 	bot->obj_type = ROBOT;
 	bot->bOnFloor = 0;
+	bot->bIsJumping = 0;
+	bot->airTime = 0.0f;
 	bot->obj = inheriteObj(bot, ROBOT);
 	if (bot->obj == NULL) return NULL;
 
@@ -54,6 +58,11 @@ Robot* newRobot() {
 	bot->obj->update = botUpdate;
 	bot->obj->render = botRender;
 
+	bot->idleAnimation = newAnimation(bot->obj, ROBOT);
+	if (bot->idleAnimation == NULL) return NULL;
+	bot->idleAnimation->comp->update = botIdleAnim;
+	ocPushBack(bot->obj->child_list, bot->idleAnimation->comp);
+
 	bot->walkAnimation = newAnimation(bot->obj, ROBOT);
 	if (bot->walkAnimation == NULL) return NULL;
 	bot->walkAnimation->comp->update = botWalkingAnim;
@@ -68,6 +77,16 @@ Robot* newRobot() {
 	if (bot->flipAnimation == NULL) return NULL;
 	bot->flipAnimation->comp->update = botFlipingAnim;
 	ocPushBack(bot->obj->child_list, bot->flipAnimation->comp);
+
+	bot->pickupAnimation = newAnimation(bot->obj, ROBOT);
+	if (bot->pickupAnimation == NULL) return NULL;
+	bot->pickupAnimation->comp->update = botPickupAnim;
+	ocPushBack(bot->obj->child_list, bot->flipAnimation->comp);
+
+	bot->fallAnimation = newAnimation(bot->obj, ROBOT);
+	if (bot->fallAnimation == NULL) return NULL;
+	bot->fallAnimation->comp->update = botFallAnim;
+	ocPushBack(bot->obj->child_list, bot->fallAnimation->comp);
 
 	return bot;
 }
@@ -103,27 +122,50 @@ void botUpdate(Object* obj, float deltatime) {
 
 	Robot* bot = cast(obj, ROBOT);
 	if (bot != NULL) {
+		if (obj->vloc[1] > 0.1f) {
+			bot->bIsJumping = 1;
+		}
+		else {
+			bot->bIsJumping = 0;
+		}
+
+		if (!bot->bOnFloor) {
+			bot->airTime += deltatime;
+		}
+		else {
+			bot->airTime = 0;
+		}
 
 		// animation
-		if (obj->vloc[0] > 0.1f || obj->vloc[2] > 0.1f && bot->bOnFloor) {
+		if (obj->vloc[0] > 0.1f || obj->vloc[2] > 0.1f && bot->bOnFloor && !bot->bIsJumping) {
 			bot->walkAnimation->start = 1;
 			bot->walkAnimation->magn = 1.0f;
 			bot->jumpAnimation->start = 0;
 			bot->jumpAnimation->timer = 0.0f;
 			bot->flipAnimation->start = 0;
 			bot->flipAnimation->timer = 0.0f;
+			bot->idleAnimation->start = 0;
 		}
-		else if (obj->vloc[0] < -0.1f || obj->vloc[2] < -0.1f && bot->bOnFloor) {
+		else if (obj->vloc[0] < -0.1f || obj->vloc[2] < -0.1f && bot->bIsJumping) {
 			bot->walkAnimation->start = -1;
 			bot->walkAnimation->magn = 1.0f;
 			bot->jumpAnimation->start = 0;
 			bot->jumpAnimation->timer = 0.0f;
 			bot->flipAnimation->start = 0;
 			bot->flipAnimation->timer = 0.0f;
+			bot->idleAnimation->start = 0;
+		}
+		else if (bot->airTime > 2.0f && bot->obj->vloc[1] < -0.1f) {
+			bot->fallAnimation->start = 1;
 		}
 		else {
+			bot->fallAnimation->start = 0;
+			bot->fallAnimation->timer = 0.0f;
 			bot->walkAnimation->start = 0;
-			//bot->walkAnimation->timer = 0.0f;
+			bot->walkAnimation->timer = 0.0f;
+			if (!bot->bIsJumping) {
+				bot->idleAnimation->start = 1;
+			}
 		}
 
 		ocClear(bot->pickupSpace);
@@ -196,7 +238,7 @@ void botCamUpdate(Object* obj, float deltatime) {
 
 void botMoving(Robot* bot, float forward, float side) {
 	if (forward != 0.0f) bot->obj->vloc[2] = forward;
-	if (side != 0.0f) bot->obj->vrot[1] = side;
+	if (side != 0.0f) bot->obj->vrot[1] = side * (bot->bOnFloor ? 1 : 5);
 }
 
 void botJump(Robot* bot) {
@@ -205,6 +247,8 @@ void botJump(Robot* bot) {
 		jmp = 1.0f;
 		bot->jumpAnimation->start = 0;
 		bot->jumpAnimation->timer = 0.0f;
+		bot->walkAnimation->start = 0;
+		bot->idleAnimation->start = 0;
 	}
 	if (bot->obj->vloc[1] >= -0.2) {
 		bot->obj->vloc[1] += 5.0f * jmp;
@@ -214,6 +258,7 @@ void botJump(Robot* bot) {
 			bot->walkAnimation->timer = 0.0f;
 			bot->flipAnimation->start = 0;
 			bot->flipAnimation->timer = 0.0f;
+			bot->idleAnimation->start = 0;
 		}
 		else {
 			bot->walkAnimation->start = 0;
@@ -222,6 +267,7 @@ void botJump(Robot* bot) {
 			bot->jumpAnimation->timer = 0.0f;
 			bot->flipAnimation->start = 1;
 			bot->flipAnimation->timer = 0.0f;
+			bot->idleAnimation->start = 0;
 		}
 		jmp *= .8f;
 	}
@@ -270,6 +316,35 @@ void botObjEnterPickupSpace(Object* self, CollisionShape* selfcs, Object* other,
 	}
 }
 
+void botIdleAnim(Component* comp, float deltatime) {
+	Animation* anim = cast(comp, ANIMATION);
+	if (anim == NULL) return;
+	if (!anim->start) return;
+	Robot* bot = cast(anim->parent, anim->parent_type);
+	if (bot == NULL) return;
+
+	BotBody* body = bot->bbody;
+
+	if (anim->timer == 0.0f) {
+		glm_mat4_identity(body->obj->transform);
+		glm_translate(body->obj->transform, (vec3) { 0.0f, 1.7f, 0.0f });
+	}
+
+	if (anim->timer < 1.0f) {
+		glm_translate(body->obj->transform, (vec3) { 0.0f, .05f * deltatime, 0.0f });
+	}
+
+	if (anim->timer >= 1.0f && anim->timer < 2.0f) {
+		glm_translate(body->obj->transform, (vec3) { 0.0f, -.05f * deltatime, 0.0f });
+	}
+
+	if (anim->timer > 2.0f) {
+		anim->timer = 0.0001f;
+	}
+
+	anim->timer += deltatime;
+}
+
 void botWalkingAnim(Component* comp, float deltatime) {
 	Animation* anim = cast(comp, ANIMATION);
 	if (anim == NULL) return;
@@ -289,7 +364,7 @@ void botWalkingAnim(Component* comp, float deltatime) {
 
 	if (anim->timer == 0.0f) {
 		glm_mat4_identity(body->obj->transform);
-		glm_translate(body->obj->transform, (vec3) { 0.0f, 1.7f, 0.0f });
+		glm_translate(body->obj->transform, (vec3) { 0.0f, 1.6f, 0.0f });
 		glm_rotate(body->obj->transform, .1f, (vec3) { 0.0f, 0.0f, 1.0f });
 
 		glm_mat4_identity(rightFKnee->obj->transform);
@@ -306,10 +381,11 @@ void botWalkingAnim(Component* comp, float deltatime) {
 
 		glm_mat4_identity(leftKnee->obj->transform);
 		glm_translate(leftKnee->obj->transform, (vec3) { .0f, -.8f, .0f });
-		glm_rotate(leftKnee->obj->transform, .2f, (vec3) { 1.0f, 0.0f, 0.0f });
+		glm_rotate(leftKnee->obj->transform, .4f, (vec3) { 1.0f, 0.0f, 0.0f });
 	}
 
 	if (anim->timer > .0f && anim->timer < .5f) {
+		glm_translate(body->obj->transform, (vec3) { 0.0f, .1 * deltatime * 2, 0.0f });
 		glm_rotate(body->obj->transform, -.1f * deltatime * 2, (vec3) { 0.0f, 0.0f, 1.0f });
 
 		glm_rotate(rightFKnee->obj->transform, 1.0f * deltatime * 2, (vec3) { 1.0f, 0.0f, 0.0f });
@@ -318,27 +394,29 @@ void botWalkingAnim(Component* comp, float deltatime) {
 
 		glm_rotate(leftFKnee->obj->transform, -.5f * deltatime * 2, (vec3) { 1.0f, 0.0f, 0.0f });
 
-		glm_rotate(leftKnee->obj->transform, -.2f * deltatime * 2, (vec3) { 1.0f, 0.0f, 0.0f });
+		glm_rotate(leftKnee->obj->transform, .4f * deltatime * 2, (vec3) { 1.0f, 0.0f, 0.0f });
 	}
 
 	if (anim->timer >= .5f && anim->timer < 1.0f) {
+		glm_translate(body->obj->transform, (vec3) { 0.0f, -.1 * deltatime * 2, 0.0f });
 		glm_rotate(body->obj->transform, -.1f * deltatime * 2, (vec3) { 0.0f, 0.0f, 1.0f });
 
 		glm_rotate(rightFKnee->obj->transform, .5f * deltatime * 2, (vec3) { 1.0f, 0.0f, 0.0f });
 
-		glm_rotate(rightKnee->obj->transform, .2f * deltatime * 2, (vec3) { 1.0f, 0.0f, 0.0f });
+		glm_rotate(rightKnee->obj->transform, .4f * deltatime * 2, (vec3) { 1.0f, 0.0f, 0.0f });
 
 		glm_rotate(leftFKnee->obj->transform, -1.0f * deltatime * 2, (vec3) { 1.0f, 0.0f, 0.0f });
 
-		glm_rotate(leftKnee->obj->transform, 1.0f * deltatime * 2, (vec3) { 1.0f, 0.0f, 0.0f });
+		glm_rotate(leftKnee->obj->transform, .2f * deltatime * 2, (vec3) { 1.0f, 0.0f, 0.0f });
 	}
 
 	if (anim->timer >= 1.0f && anim->timer < 1.5f) {
+		glm_translate(body->obj->transform, (vec3) { 0.0f, .1 * deltatime * 2, 0.0f });
 		glm_rotate(body->obj->transform, .1f * deltatime * 2, (vec3) { 0.0f, 0.0f, 1.0f });
 
 		glm_rotate(rightFKnee->obj->transform, -.5f * deltatime * 2, (vec3) { 1.0f, 0.0f, 0.0f });
 
-		glm_rotate(rightKnee->obj->transform, -.2f * deltatime * 2, (vec3) { 1.0f, 0.0f, 0.0f });
+		glm_rotate(rightKnee->obj->transform, .4f * deltatime * 2, (vec3) { 1.0f, 0.0f, 0.0f });
 
 		glm_rotate(leftFKnee->obj->transform, 1.0f * deltatime * 2, (vec3) { 1.0f, 0.0f, 0.0f });
 
@@ -346,15 +424,16 @@ void botWalkingAnim(Component* comp, float deltatime) {
 	}
 
 	if (anim->timer >= 1.5f && anim->timer < 2.0f) {
+		glm_translate(body->obj->transform, (vec3) { 0.0f, -.1 * deltatime * 2, 0.0f });
 		glm_rotate(body->obj->transform, .1f * deltatime * 2, (vec3) { 0.0f, 0.0f, 1.0f });
 
 		glm_rotate(rightFKnee->obj->transform, -1.0f * deltatime * 2, (vec3) { 1.0f, 0.0f, 0.0f });
 
-		glm_rotate(rightKnee->obj->transform, 1.0f * deltatime * 2, (vec3) { 1.0f, 0.0f, 0.0f });
+		glm_rotate(rightKnee->obj->transform, .2f * deltatime * 2, (vec3) { 1.0f, 0.0f, 0.0f });
 
 		glm_rotate(leftFKnee->obj->transform, .5f * deltatime * 2, (vec3) { 1.0f, 0.0f, 0.0f });
 
-		glm_rotate(leftKnee->obj->transform, .2f * deltatime * 2, (vec3) { 1.0f, 0.0f, 0.0f });
+		glm_rotate(leftKnee->obj->transform, .4f * deltatime * 2, (vec3) { 1.0f, 0.0f, 0.0f });
 
 	}
 
@@ -436,6 +515,44 @@ void botFlipingAnim(Component* comp, float deltatime) {
 	if (anim->timer < .25f) {
 		glm_rotate(body->obj->transform, M_PI * 2 * deltatime * 4, (vec3) { 1.0f, 0.0f, 0.0f });
 	}
+
+	anim->timer += deltatime;
+}
+
+void botPickupAnim(Component* comp, float deltatime) {
+}
+
+void botFallAnim(Component* comp, float deltatime) {
+	Animation* anim = cast(comp, ANIMATION);
+	if (anim == NULL) return;
+	if (!anim->start) return;
+	Robot* bot = cast(anim->parent, anim->parent_type);
+	if (bot == NULL) return;
+
+	BotBody* body = bot->bbody;
+	Connector* rightFKnee = bot->bbody->rightThighConnector;
+	Connector* rightKnee = bot->bbody->rightCalfConnector;
+	Connector* leftFKnee = bot->bbody->leftThighConnector;
+	Connector* leftKnee = bot->bbody->leftCalfConnector;
+	Connector* rightFArm = bot->bbody->rightFArm;
+	Connector* rightArm = bot->bbody->rightArm;
+	Connector* leftFArm = bot->bbody->leftFArm;
+	Connector* leftArm = bot->bbody->leftArm;
+
+	if (anim->timer == 0.0f) {
+		glm_mat4_identity(body->obj->transform);
+		glm_translate(body->obj->transform, (vec3) { 0.0f, .3f, 0.0f });
+	}
+
+	glm_rotate(body->obj->transform, deltatime * (rand() % 100) / 5, (vec3) { (float) (rand() % 100) / 100, (float) (rand() % 100) / 100, (float) (rand() % 100) / 100 });
+	glm_rotate(rightFKnee->obj->transform, deltatime * (rand() % 100) / 5, (vec3) { (float) (rand() % 100) / 1000, (float) (rand() % 100) / 100, (float) (rand() % 100) / 500 });
+	glm_rotate(leftFKnee->obj->transform, deltatime * (rand() % 100) / 5, (vec3) { (float) (rand() % 100) / 1000, (float) (rand() % 100) / 100, (float) (rand() % 100) / 500 });
+	glm_rotate(rightKnee->obj->transform, deltatime * (rand() % 100) / 5, (vec3) { (float) (rand() % 100) / 1000, (float) (rand() % 100) / 100, (float) (rand() % 100) / 500 });
+	glm_rotate(leftKnee->obj->transform, deltatime * (rand() % 100) / 5, (vec3) { (float) (rand() % 100) / 1000, (float) (rand() % 100) / 100, (float) (rand() % 100) / 500 });
+	glm_rotate(rightFArm->obj->transform, deltatime * (rand() % 100) / 5, (vec3) { (float) (rand() % 100) / 1000, (float) (rand() % 100) / 100, (float) (rand() % 100) / 500 });
+	glm_rotate(leftFArm->obj->transform, deltatime * (rand() % 100) / 5, (vec3) { (float) (rand() % 100) / 1000, (float) (rand() % 100) / 100, (float) (rand() % 100) / 500 });
+	glm_rotate(rightArm->obj->transform, deltatime * (rand() % 100) / 5, (vec3) { (float) (rand() % 100) / 1000, (float) (rand() % 100) / 100, (float) (rand() % 100) / 500 });
+	glm_rotate(leftArm->obj->transform, deltatime * (rand() % 100) / 5, (vec3) { (float) (rand() % 100) / 1000, (float) (rand() % 100) / 100, (float) (rand() % 100) / 500 });
 
 	anim->timer += deltatime;
 }

@@ -12,6 +12,8 @@ struct _bot {
 	obj_type_t obj_type;
 
 	unsigned char bOnFloor;
+	unsigned char bIsJumping;
+	float airTime;
 	Camera* cam;
 
 	BotBody* bbody;
@@ -22,10 +24,12 @@ struct _bot {
 
 	ObjContainer* pickupSpace;
 
+	Animation* idleAnimation;
 	Animation* walkAnimation;
 	Animation* jumpAnimation;
 	Animation* flipAnimation;
 	Animation* pickupAnimation;
+	Animation* fallAnimation;
 
 	Object* obj;
 };
@@ -43,6 +47,9 @@ void botPickup(Robot* bot);
 void botDrop(Robot* bot);
 void botObjEnterPickupSpace(Object* self, CollisionShape* selfcs, Object* other, CollisionShape* othercs);
 
+void botIdleAnim(Component* comp, float deltatime);
 void botWalkingAnim(Component* comp, float deltatime);
 void botJumpingAnim(Component* comp, float deltatime);
 void botFlipingAnim(Component* comp, float deltatime);
+void botPickupAnim(Component* comp, float deltatime);
+void botFallAnim(Component* comp, float deltatime);

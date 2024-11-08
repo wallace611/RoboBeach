@@ -162,7 +162,7 @@ void build_body_part(BotBody* bbody) {
 	if (rThCon == NULL) return NULL;
 	ocPushBack(bbody->obj->child_list, rThCon->obj);
 	glm_translate(rThCon->obj->transform, (vec3) { .25f, -.5f, .0f });
-	glm_scale(rThigh->obj->transform, (vec3) { .9f, .9f, .9f });
+	glm_scale(rThigh->obj->transform, (vec3) { .8f, .8f, .8f });
 	//printf("rThigh: %d\nrThCon: %d\n", rThigh->comp->id, rThCon->comp->id);
 	
 	// left thigh
@@ -172,7 +172,7 @@ void build_body_part(BotBody* bbody) {
 	if (lThCon == NULL) return NULL;
 	ocPushBack(bbody->obj->child_list, lThCon->obj);
 	glm_translate(lThCon->obj->transform, (vec3) { -.25f, -.5f, .0f });
-	glm_scale(lThigh->obj->transform, (vec3) { .9f, .9f, .9f });
+	glm_scale(lThigh->obj->transform, (vec3) { .8f, .8f, .8f });
 	//printf("lThigh: %d\nlThCon: %d\n", lThigh->comp->id, lThCon->comp->id);
 
 	// right calf

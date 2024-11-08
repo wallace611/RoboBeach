@@ -19,6 +19,7 @@ typedef int comp_type_t;
 #define BOT_HEAD  1029
 #define BOT_ARM	  1030
 #define ANIMATION 1031
+#define ANIM_S_M  1032
 
 int generate_checkcode(void* obj);
 int is_checkcode_valid(void* obj, int code);
