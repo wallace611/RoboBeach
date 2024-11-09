@@ -18,6 +18,7 @@ String* makeString(char* texts, size_t length);
 String* strCpy(String* src);
 char* strToChar(String* src);
 int strAppend(String* str, char text);
+int strExpandc(String* dst, char* src);
 int strExpands(String* dst, String* src);
 void strClear(String* str);
 void strPopBack(String* str);

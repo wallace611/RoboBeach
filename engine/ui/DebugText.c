@@ -12,18 +12,12 @@ DebugText* newDebugText() {
 	dbtxt->objToShow = newObjContainer();
 	if (dbtxt->objToShow == NULL) return NULL;
 
-	dbtxt->ready = dbtReady;
-	dbtxt->update = dbtUpdate;
+    dbtxt->output = newString();
+    if (dbtxt->output == NULL) return NULL;
+
 	dbtxt->render = dbtRender;
 
 	return dbtxt;
-}
-
-void dbtReady(DebugText* dbtxt) {
-}
-
-void dbtUpdate(DebugText* dbtxt, float deltatime) {
-	dbtxt->deltatime = deltatime;
 }
 
 void dbtRender(DebugText* dbtxt) {
@@ -39,7 +33,7 @@ void dbtRender(DebugText* dbtxt) {
     glColor4f(1.0f, 1.0f, 1.0f, 0.5f);
     glRasterPos2f(10, window_hei - 20);
 
-    String* s = newString();
+    /*String* s = newString();
 
     char tmp[1024] = { 0 };
 
@@ -94,13 +88,21 @@ void dbtRender(DebugText* dbtxt) {
 
         strAppend(s, '\n');
         strAppend(s, '\n');
-    }
+    }*/
 
-    glutBitmapString(GLUT_BITMAP_8_BY_13, s->texts);
+    glutBitmapString(GLUT_BITMAP_8_BY_13, dbtxt->output->texts);
 
-    strFree(s);
+    strClear(dbtxt->output);
 
     glPopMatrix();
     glMatrixMode(GL_PROJECTION);
     glPopMatrix();
+}
+
+void dbtPushString(DebugText* dbgtxt, String* s) {
+    strExpands(dbgtxt->output, s);
+}
+
+void dbtPushChars(DebugText* dbgtxt, char* c) {
+    strExpandc(dbgtxt->output, c);
 }

@@ -95,10 +95,29 @@ void tick(float deltatime) {
 
 	imPressUpdate();
 
+	// update debug info
+	char tmp[128];
+	sprintf_s(tmp,
+		128,
+		"frame rate: %3.1f, deltatime: %7.4f, timer: %7.2f\n",
+		engineGetCurrentFPS(),
+		deltatime,
+		engineGetTimer()
+	);
+	dbtPushChars(objDebug, tmp);
+	sprintf_s(tmp,
+		128,
+		"windows width: %4d, height: %4d\n" \
+		"mouse center x: %4d, y: %4d\n",
+		window_wid,
+		window_hei,
+		mouse_center_x,
+		mouse_center_y
+	);
+	dbtPushChars(objDebug, tmp);
+
 	if (!is_paused) {
 		worldUpdate(world, deltatime);
-
-		objDebug->update(objDebug, deltatime);
 
 		// warp the cursor to the center
 		if (allowMouseMotion) {
