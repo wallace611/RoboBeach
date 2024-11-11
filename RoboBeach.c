@@ -7,6 +7,7 @@
 #include "code/object/robot/Robot.h"
 #include "code/object/Floor.h"
 #include "input/InputMapper.h"
+#include "code/object/Rock.h"
 
 #include <stdio.h>
 
@@ -20,6 +21,8 @@ perspective_t persp;
 
 Triangle* t1;
 Triangle* t2;
+Rock* rock1;
+Rock* rock2;
 Robot* r;
 Floor* flr;
 Camera* worldCam;
@@ -91,7 +94,6 @@ int main(int argc, char** argv) {
 	glm_translate(t1->obj->transform, (vec3) { 1.0f, 0.0f, 10.0f });
 	worldSpawnObj(world, t1->obj);
 	CollisionShape* cs = newCollisionShape();
-	cs->bIsVisible = 1;
 	worldSpawnObj(world, cs->obj);
 	objAttachmentTo(t1->obj, cs->obj);
 	cs->channel = CC_PICKUP;
@@ -100,7 +102,6 @@ int main(int argc, char** argv) {
 	glm_translate(t1->obj->transform, (vec3) { 0.0f, 0.0f, 10.0f });
 	worldSpawnObj(world, t1->obj);
 	cs = newCollisionShape();
-	cs->bIsVisible = 1;
 	worldSpawnObj(world, cs->obj);
 	objAttachmentTo(t1->obj, cs->obj);
 	cs->channel = CC_PICKUP;
@@ -109,6 +110,16 @@ int main(int argc, char** argv) {
 	glm_translate(t2->obj->transform, (vec3) { 2.0f, 2.0f, 0.0f });
 	worldSpawnObj(world, t2->obj);
 	objAttachmentTo(t1->obj, t2->obj);
+
+	rock1 = newRock();
+	glm_translate(rock1->obj->transform, (vec3) { 2.0f, -1.0f, 4.0f });
+	glm_scale(rock1->obj->transform, (vec3) { 2.0f, 2.0f, 2.0f });
+	worldSpawnObj(world, rock1->obj);
+
+	rock2 = newRock();
+	glm_translate(rock2->obj->transform, (vec3) { -2.0f, -1.0f, 4.0f });
+	glm_scale(rock2->obj->transform, (vec3) { 2.0f, 2.0f, 2.0f });
+	worldSpawnObj(world, rock2->obj);
 
 	r = newRobot();
 	worldSpawnObj(world, r->obj);

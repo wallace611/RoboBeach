@@ -11,6 +11,7 @@ typedef int comp_type_t;
 #define ROBOT	  4
 #define COLLISION 5
 #define FLOOR	  6
+#define ROCK	  7
 
 // Registered component type > 1024
 #define COMPONENT 1025

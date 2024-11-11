@@ -19,6 +19,7 @@ BotBody* newBotBody() {
 void bbodyUpdate(Component* obj, float deltatime) {
 	BotBody* body = cast(obj, BOT_BODY);
 	
+	compUpdateChild(obj, deltatime);
 }
 
 void bbodyRender(Component* obj) {

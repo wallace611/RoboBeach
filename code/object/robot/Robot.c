@@ -17,6 +17,7 @@ Robot* newRobot() {
 	bot->bIsHolding = 0;
 	bot->bIsFalling = 0;
 	bot->bIsFalled = 0;
+	bot->bCollideWithBlock = 0;
 	bot->airTime = 0.0f;
 	bot->obj = inheriteObj(bot, ROBOT);
 	if (bot->obj == NULL) return NULL;
@@ -40,6 +41,7 @@ Robot* newRobot() {
 	if (bcs == NULL) return NULL;
 	objAttachmentTo(bot->obj, bcs->obj);
 	worldSpawnObj(world, bcs->obj);
+	bcs->channel = CC_COLLISION;
 	bcs->height = 2.0f;
 	bcs->obj->transform[3][1] = 1.0f;
 	bcs->collided = botCollided;
@@ -48,8 +50,9 @@ Robot* newRobot() {
 	if (pcs == NULL) return NULL;
 	objAttachmentTo(bot->obj, pcs->obj);
 	worldSpawnObj(world, pcs->obj);
-	pcs->bIsVisible = 1;
-	pcs->height = 1.0f;
+	pcs->channel = CC_PICKUP;
+	glm_translate(pcs->obj->transform, (vec3) { 0.0f, 2.0f, 0.0f });
+	pcs->height = 4.0f;
 	pcs->width = 2.0f;
 	pcs->depth = 2.0f;
 	pcs->collided = botObjEnterPickupSpace;
@@ -163,15 +166,20 @@ void botUpdate(Object* obj, float deltatime) {
 		}
 
 		char tmp[512];
-		sprintf_s(tmp, 
-			512, 
-			"on floor: %d, is jumping: %d, is holding: %d, is falling: %d, falled: %d\n" \
+		sprintf_s(tmp,
+			512,
+			"on floor: %d, is jumping: %d, is holding: %d, is falling: %d, falled: %d, is collide with block: %d\n" \
+			"location: %3.2f %3.2f %3.2f\n" \
 			"velocity: %3.2f %3.2f %3.2f\n",
 			bot->bOnFloor,
 			bot->bIsJumping,
 			bot->bIsHolding,
 			bot->bIsFalling,
 			bot->bIsFalled,
+			bot->bCollideWithBlock,
+			obj->transform[3][0],
+			obj->transform[3][1],
+			obj->transform[3][2],
 			obj->vloc[0],
 			obj->vloc[1],
 			obj->vloc[2]
@@ -213,6 +221,7 @@ void botUpdate(Object* obj, float deltatime) {
 
 		ocClear(bot->pickupSpace);
 		bot->bOnFloor = 0;
+		bot->bCollideWithBlock = 0;
 	}
 }
 
@@ -229,8 +238,8 @@ void botRender(Object* obj) {
 }
 
 void botCollided(Object* self, CollisionShape* selfcs, Object* other, CollisionShape* othercs) {
-	if (other == NULL || othercs == NULL) return;
-	if (other->obj_type == FLOOR) {
+	if (other == NULL || othercs == NULL || self == other) return;
+	if (other->obj_type == FLOOR && selfcs->channel == CC_COLLISION) {
 		vec3 scl;
 		glm_decompose_scalev(other->transform, scl);
 		float y = other->transform[3][1] + scl[1] * othercs->height / 2;
@@ -238,7 +247,35 @@ void botCollided(Object* self, CollisionShape* selfcs, Object* other, CollisionS
 		self->vloc[1] = 0.0f;
 
 		Robot* bot = cast(self, ROBOT);
+		if (bot == NULL) return;
 		bot->bOnFloor = 1;
+	}
+	else if (othercs->channel == CC_COLLISION) {
+		// Handle collision with a blocking object
+		vec4 sloc, oloc;
+		mat4 srot, orot;
+		vec3 sscl, oscl;
+		glm_decompose(self->transform, sloc, srot, sscl);
+		glm_decompose(other->transform, oloc, orot, oscl);
+
+		// Calculate the direction of the collision
+		vec3 sub;
+		glm_vec3_sub((vec3){sloc[0], sloc[1], sloc[2]}, (vec3){oloc[0], oloc[1], oloc[2]}, sub);
+		glm_vec3_normalize(sub);
+
+		// Calculate the penetration depth
+		float penetrationDepth = .08f;
+
+		// Move the object back along the collision direction
+		vec3 correction;
+		glm_vec3_scale(sub, penetrationDepth, correction);
+		self->transform[3][0] += correction[0];
+		self->transform[3][1] += correction[1];
+		self->transform[3][2] += correction[2];
+
+		Robot* bot = cast(self, ROBOT);
+		if (bot == NULL) return NULL;
+		bot->bCollideWithBlock = 1;
 	}
 }
 
@@ -293,6 +330,8 @@ void botJump(Robot* bot) {
 		bot->jumpAnimation->timer = 0.0f;
 		bot->walkAnimation->start = 0;
 		bot->idleAnimation->start = 0;
+		bot->touchDownAnimation->timer = 0.0f;
+		bot->touchDownAnimation->start = 0;
 	}
 	if (bot->obj->vloc[1] >= -0.2) {
 		bot->obj->vloc[1] += 5.0f * jmp;
@@ -334,6 +373,8 @@ void botPickup(Robot* bot) {
 	}
 	if (minDistObj != NULL) {
 		botDrop(bot);
+		bot->dropAnimation->start = 0;
+		bot->dropAnimation->timer = 0.0f;
 		bot->bIsHolding = 1;
 		objAttachmentTo(bot->obj, minDistObj);
 		bot->pickedObj = minDistObj;
@@ -356,6 +397,7 @@ void botDrop(Robot* bot) {
 	bot->pickedObj = NULL;
 	bot->bIsHolding = 0;
 	bot->dropAnimation->start = 1;
+	bot->dropAnimation->timer = 0.0f;
 }
 
 void botObjEnterPickupSpace(Object* self, CollisionShape* selfcs, Object* other, CollisionShape* othercs) {

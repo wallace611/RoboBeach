@@ -9,9 +9,6 @@ CollisionShape* newCollisionShape() {
 	cs->width = 1.0f;
 	cs->height = 1.0f;
 	cs->depth = 1.0f;
-	cs->color[0] = 1.0f;
-	cs->color[1] = 1.0f;
-	cs->color[2] = 0.0f;
 	cs->bInFront = 1;
 	cs->bIsVisible = 0;
 	cs->obj = inheriteObj(cs, COLLISION);
@@ -70,7 +67,28 @@ void csRender(Object* obj) {
             {-halfWidth,  halfHeight,  halfDepth}
         };
 
-        glColor4f(cs->color[0], cs->color[1], cs->color[2], .2f);
+        float color[3];
+
+        switch (cs->channel) {
+        case CC_COLLISION:
+            color[0] = 0.8f;
+            color[1] = 0.1f;
+            color[2] = 0.1f;
+            break;
+
+        case CC_PICKUP:
+            color[0] = 0.2f;
+            color[1] = 0.8f;
+            color[2] = 0.2f;
+            break;
+
+        default:
+            color[0] = 0.0f;
+            color[1] = 0.0f;
+            color[2] = 0.0f;
+            break;
+        }
+        glColor4f(color[0], color[1], color[2], .2f);
 
         // 前面
         glVertex3fv(vertices[0]);
@@ -111,7 +129,7 @@ void csRender(Object* obj) {
         glEnd();
 
         // 渲染盒子的邊緣
-        glColor3fv(cs->color);
+        glColor3fv(color);
 
         glBegin(GL_LINES);
         for (int i = 0; i < 4; i++) {

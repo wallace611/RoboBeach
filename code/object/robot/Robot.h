@@ -16,6 +16,7 @@ struct _bot {
 	unsigned char bIsHolding;
 	unsigned char bIsFalling;
 	unsigned char bIsFalled;
+	unsigned char bCollideWithBlock;
 	float airTime;
 	Camera* cam;
 

@@ -15,7 +15,7 @@ struct _collision {
 	collision_channel_t channel;
 	float width, height, depth;
 
-	float color[3];
+	
 	unsigned char bInFront;
 	unsigned char bIsVisible;
 

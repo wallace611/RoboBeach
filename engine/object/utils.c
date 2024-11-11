@@ -12,6 +12,7 @@
 #include "object/robot/components/arm/BotArm.h"
 #include "object/Floor.h"
 #include "object/component/Animation.h"
+#include "object/Rock.h"
 
 int generate_checkcode(void* pt) {
 	if (pt == NULL) return -1;
@@ -92,6 +93,12 @@ void* obj_casting(void* pt, obj_type_t type) {
 	
 	case FLOOR:
 		if (((Floor*)up)->obj_type == FLOOR) {
+			return up;
+		}
+		break;
+
+	case ROCK:
+		if (((Rock*)up)->obj_type == ROCK) {
 			return up;
 		}
 		break;

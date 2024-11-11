@@ -9,8 +9,6 @@
 #include "object/Camera.h"
 #include "object/Object.h"
 
-#include "../Test.h"
-
 void engineInit(int* argc, char** argv) {
 	target_delta_nano = (long long) 1e9 / ENG_DEFAULT_FPS;
 	current_fps = 0.0f;
@@ -50,7 +48,6 @@ void engineInit(int* argc, char** argv) {
 
 	imInit();
 
-	test();
 	return 0;
 }
 
