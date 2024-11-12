@@ -12,11 +12,12 @@ Floor* newFloor() {
 	floor->color[1] = .72f;
 	floor->color[2] = .09f;
 
-	CollisionShape* cs = floor->csShape = newCollisionShape();
+	CollisionShape* cs = floor->csCollide = newCollisionShape();
 	if (cs == NULL) {
 		free(floor);
 		return NULL;
 	}
+	cs->channel = CC_FLOOR;
 
 	floor->obj = inheriteObj(floor, FLOOR);
 	if (floor->obj == NULL) {

@@ -70,6 +70,12 @@ void csRender(Object* obj) {
         float color[3];
 
         switch (cs->channel) {
+        case CC_DEFAULT:
+            color[0] = 0.8f;
+            color[1] = 0.8f;
+            color[2] = 0.8f;
+            break;
+
         case CC_COLLISION:
             color[0] = 0.8f;
             color[1] = 0.1f;

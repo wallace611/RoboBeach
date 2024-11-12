@@ -48,4 +48,6 @@ static void reshapeCallback(int w, int h);
 void moving(float x, float y);
 void rotating(float pitch, float yaw);
 
-void pause();
+void enginePause();
+
+void check(void* pt);

@@ -181,7 +181,7 @@ void reshapeCallback(int w, int h) {
 	glMatrixMode(GL_MODELVIEW);
 }
 
-void pause() {
+void enginePause() {
 	if (is_paused) {
 		glutSetCursor(GLUT_CURSOR_NONE);
 		is_paused = !is_paused;
@@ -193,5 +193,11 @@ void pause() {
 		glutSetCursor(GLUT_CURSOR_LEFT_ARROW);
 		is_paused = !is_paused;
 		allowMouseMotion = 0;
+	}
+}
+
+void check(void* pt) {
+	if (pt == NULL) {
+		exit(-1);
 	}
 }

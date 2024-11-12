@@ -69,7 +69,7 @@ void mappingKey() {
 	imMapActionKey('q', KEY_PRESS, drop);
 	imMapActionKey(32, KEY_PRESS, jump);
 	imMapFloat2Key(MOUSE_MOTION, NULL, rotating, 0, 0);
-	imMapActionKey(27, KEY_PRESS, pause);
+	imMapActionKey(27, KEY_PRESS, enginePause);
 	imMapActionKey('v', KEY_PRESS, switchPerspective);
 	imMapActionKey('b', KEY_PRESS, kneeDown);
 	imMapActionKey('r', KEY_PRESS, startRun);

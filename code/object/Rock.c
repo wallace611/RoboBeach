@@ -28,6 +28,16 @@ void rockReady(Object* obj) {
 }
 
 void rockUpdate(Object* obj, float deltatime) {
+	vec3 atmp, vtmp;
+	glm_vec3_scale(obj->aloc, deltatime, atmp);
+	glm_vec3_copy(obj->vloc, vtmp);
+	glm_vec3_add(vtmp, atmp, obj->vloc);
+
+	glm_vec3_scale(obj->vloc, deltatime, vtmp);
+	glm_translate(obj->transform, vtmp);
+	obj->vloc[1] *= 0.9995;
+	obj->vloc[0] *= 0.8;
+	obj->vloc[2] *= 0.8;
 	objUpdateChild(obj, deltatime);
 }
 

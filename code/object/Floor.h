@@ -8,7 +8,7 @@ typedef struct _floor Floor;
 struct _floor {
 	obj_type_t obj_type;
 
-	CollisionShape* csShape;
+	CollisionShape* csCollide;
 
 	float color[3];
 

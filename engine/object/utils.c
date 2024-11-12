@@ -13,6 +13,8 @@
 #include "object/Floor.h"
 #include "object/component/Animation.h"
 #include "object/Rock.h"
+#include "object/Umbrella.h"
+#include "object/Fan.h"
 
 int generate_checkcode(void* pt) {
 	if (pt == NULL) return -1;
@@ -99,6 +101,18 @@ void* obj_casting(void* pt, obj_type_t type) {
 
 	case ROCK:
 		if (((Rock*)up)->obj_type == ROCK) {
+			return up;
+		}
+		break;
+
+	case UMBRELLA:
+		if (((Umbrella*)up)->obj_type == UMBRELLA) {
+			return up;
+		}
+		break;
+
+	case FAN:
+		if (((Fan*)up)->obj_type == FAN) {
 			return up;
 		}
 		break;
