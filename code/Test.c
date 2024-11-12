@@ -1,32 +1,4 @@
-#include "Engine.h"
-
-#include "utils/ObjContainer.h"
-#include "object/Object.h"
-#include "utils/String.h"
-#include "code/object/Triangle.h"
-#include "code/object/robot/Robot.h"
-#include "code/object/Floor.h"
-#include "input/InputMapper.h"
-#include "code/object/Rock.h"
-
-#include <stdio.h>
-
-#include <cglm/cglm.h>
-
-typedef unsigned char perspective_t;
-#define RB_ROBOT	1
-#define RB_WORLD	2
-
-perspective_t persp;
-
-Triangle* t1;
-Triangle* t2;
-Rock* rock1;
-Rock* rock2;
-Robot* r;
-Floor* flr;
-Camera* worldCam;
-Camera* botCam;
+#include "Test.h"
 
 void switchPerspective() {
 	if (persp == RB_WORLD) {
@@ -104,8 +76,8 @@ void mappingKey() {
 	imMapActionKey('r', KEY_RELEASE, stopRun);
 }
 
-int main(int argc, char** argv) {
-	engineInit(&argc, argv);
+int runTest(int* argc, char** argv) {
+	engineInit(argc, argv);
 
 	t1 = newTriangle();
 	glm_translate(t1->obj->transform, (vec3) { 1.0f, 0.0f, 10.0f });
