@@ -87,3 +87,10 @@ void worldCollisionDetection(World* world) {
         }
     }
 }
+
+void worldToggleCollisionVision(World* world) {
+    for (int i = 0; i < world->collisionList->end; i++) {
+        CollisionShape* cs = world->collisionList->list[i];
+        cs->bIsVisible = !cs->bIsVisible;
+    }
+}

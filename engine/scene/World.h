@@ -17,3 +17,4 @@ int worldSpawnObj(World* world, Object* obj);
 int worldKillObj(World* world, Object* obj);
 void worldSetCamera(World* world, Camera* cam);
 void worldCollisionDetection(World* world);
+void worldToggleCollisionVision(World* world);
