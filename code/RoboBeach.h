@@ -38,6 +38,7 @@ void rbSwitchCamera();
 void rbKneeDown();
 void rbPickup();
 void rbDrop();
+void rbThrow();
 void rbRun(float val);
 void rbPause();
 void rbShowCollision();

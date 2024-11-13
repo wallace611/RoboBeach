@@ -33,6 +33,11 @@ void setupObjects() {
 	glm_translate(Scene.water->obj->transform, (vec3) { .0f, -2.0f, 35.0f });
 	glm_scale(Scene.water->obj->transform, (vec3) { 50.0f, 1.0f, 50.0f });
 	glm_translate(Scene.water->csCollide->obj->transform, (vec3) { .0f, -2.0f, .0f });
+	CollisionShape* water = newCollisionShape();
+	check(water);
+	water->channel = CC_WATER;
+	worldSpawnObj(world, water->obj);
+	objAttachmentTo(Scene.water->obj, water->obj);
 
 	Scene.rock1 = newRock();
 	check(Scene.rock1);
@@ -101,6 +106,7 @@ void setupInputMapping() {
 	imMapFloat1Key('r', KEY_RELEASE, rbRun, 1.0f);
 	imMapActionKey('v', KEY_PRESS, rbSwitchCamera);
 	imMapActionKey('z', KEY_PRESS, rbShowCollision);
+	imMapActionKey('t', KEY_PRESS, rbThrow);
 }
 
 void rbMove(float forward, float side) {
@@ -143,6 +149,10 @@ void rbPickup() {
 
 void rbDrop() {
 	botDrop(Scene.bot);
+}
+
+void rbThrow() {
+	botThrow(Scene.bot);
 }
 
 void rbRun(float val) {

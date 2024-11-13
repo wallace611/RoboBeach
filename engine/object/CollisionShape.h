@@ -7,6 +7,7 @@ typedef int collision_channel_t;
 #define CC_COLLISION	1
 #define CC_PICKUP		2
 #define CC_FLOOR		3
+#define CC_WATER		4
 
 typedef struct _collision CollisionShape;
 

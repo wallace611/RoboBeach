@@ -18,6 +18,7 @@ struct _bot {
 	unsigned char bIsFalled;
 	unsigned char bCollideWithBlock;
 	unsigned char bIsKneeDown;
+	unsigned char bIsSwimming;
 	float airTime;
 	Camera* cam;
 
@@ -31,6 +32,7 @@ struct _bot {
 
 	Animation* idleAnimation;
 	Animation* walkAnimation;
+	Animation* swimAnimation;
 	Animation* jumpAnimation;
 	Animation* touchDownAnimation;
 	Animation* flipAnimation;
@@ -54,10 +56,12 @@ void botJump(Robot* bot);
 void botToggleKneeDown(Robot* bot);
 void botPickup(Robot* bot);
 void botDrop(Robot* bot);
+void botThrow(Robot* bot);
 void botObjEnterPickupSpace(Object* self, CollisionShape* selfcs, Object* other, CollisionShape* othercs);
 
 void botIdleAnim(Component* comp, float deltatime);
 void botWalkingAnim(Component* comp, float deltatime);
+void botSwimingAnim(Component* comp, float deltatime);
 void botJumpingAnim(Component* comp, float deltatime);
 void botTouchDownAnim(Component* comp, float deltatime);
 void botFlipingAnim(Component* comp, float deltatime);

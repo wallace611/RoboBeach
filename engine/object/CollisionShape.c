@@ -88,6 +88,12 @@ void csRender(Object* obj) {
             color[2] = 0.2f;
             break;
 
+        case CC_WATER:
+            color[0] = 0.1f;
+            color[1] = 0.1f;
+            color[2] = 0.8f;
+            break;
+
         default:
             color[0] = 0.0f;
             color[1] = 0.0f;
