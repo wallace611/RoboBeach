@@ -61,6 +61,7 @@ void* cast(void* pt, int target_type) {
 void* obj_casting(void* pt, obj_type_t type) {
 	Object* obj = (Object*)pt;
 	if (!is_checkcode_valid(obj, obj->check_code)) return NULL;
+	if (type == OBJECT) return obj;
 
 	void* up = obj->inheritance;
 	if (up == NULL) return NULL;

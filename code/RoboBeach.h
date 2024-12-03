@@ -19,11 +19,15 @@ struct _scene {
 	Umbrella* umb5;
 	Umbrella* umb6;
 	Fan* fan1;
+	Object* axis;
+	Object* viewVolume;
 	
 	Robot* bot;
 	unsigned int currentCamera;
 	Camera* cameras[4];
 } Scene;
+
+float fov;
 
 int runRoboBeach(int* argc, char** argv);
 
@@ -42,3 +46,8 @@ void rbThrow();
 void rbRun(float val);
 void rbPause();
 void rbShowCollision();
+void rbZoom(float val);
+void rbSwitchView();
+
+void axisRender(Object* obj);
+void fpsCamUpdate(Object* obj, float deltatime);

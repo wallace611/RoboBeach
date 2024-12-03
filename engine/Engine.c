@@ -8,6 +8,7 @@
 #include "input/InputMapper.h"
 #include "object/Camera.h"
 #include "object/Object.h"
+#include "utils/Shapes.h"
 
 #include "RoboBeach.h"
 
@@ -49,6 +50,8 @@ void engineInit(int* argc, char** argv) {
 	engineRenderInit();
 
 	imInit();
+
+	o = newCamera();
 
 	return 0;
 }
@@ -135,10 +138,148 @@ void tick(float deltatime) {
 	glutPostRedisplay();
 }
 
+void make_view(int x) {
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
+	float view_distance = 40.0f;  // 視角距離，可以根據需要調整
+	float window_ratio = (float)window_wid / (float)window_hei;  // 計算寬高比
+
+	switch(x) {
+	case 1:   // X方向平行視角
+		gluLookAt(view_distance, 0.0, 0.0,  0.0, 0.0, 0.0,  0.0, 1.0, 0.0);
+		break;
+	case 2:   // Y方向平行視角
+		gluLookAt(0.0, view_distance, 0.0,  0.0, 0.0, 0.0,  1.0, 0.0, 0.0);
+		break;
+	case 3:   // Z方向平行視角
+		gluLookAt(0.0, 0.0, view_distance,  0.0, 0.0, 0.0,  0.0, 1.0, 0.0);
+		break;
+	case 4:   // 透視投影
+		//gluLookAt(view_distance * window_ratio, view_distance, view_distance,  Scene.bot->obj->transform[3][0], Scene.bot->obj->transform[3][1], Scene.bot->obj->transform[3][2], 0.0, 1.0, 0.0);
+		break;
+	}
+}
+
+/*------------------------------------------------------
+* Procedure to make projection matrix
+*/
+void make_projection(int x)
+{
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+
+	// Check if we are using perspective projection
+	if(x == 4) {
+		gluPerspective(world->cam->fov, (double)window_wid / (double)window_hei, 1.5, 50.0);
+	} else {
+		// Adjust orthographic projection based on camera FOV
+		float scale_factor = 60.0f / (fov); // Scaling factor, assuming 60 is a baseline FOV
+
+		// Use the scale factor to modify the orthographic bounds
+		if(window_wid > window_hei)
+			glOrtho(
+				-40.0 * scale_factor, 
+				40.0 * scale_factor, 
+				-40.0 * (float)window_hei / (float)window_hei * scale_factor, 
+				40.0 * (float)window_hei / (float)window_wid * scale_factor, 
+				0.1, 10000.0
+			);
+		else
+			glOrtho(
+				-40.0 * (float)window_wid / (float)window_hei * scale_factor, 
+				40.0 * (float)window_wid / (float)window_hei * scale_factor, 
+				-40.0 * scale_factor, 
+				40.0 * scale_factor, 
+				0.1, 10000.0
+			);
+	}
+	glMatrixMode(GL_MODELVIEW);
+}
+
+
+double aspectRatio;
+
 void displayCallback() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	int width = window_wid;
+	int height = window_hei;
 
-	worldRender(world);
+	switch (camera_mode) {
+	case CAM_ALL:
+		world->bUseCamera = 1;
+		worldSetCamera(world, Scene.cameras[Scene.currentCamera]);
+		make_view(4);
+		make_projection(4);
+		glViewport(width/2, 0, width/2, height/2);
+		worldRender(world);
+
+		glm_mat4_identity(o->obj->transform);
+		glm_translate(o->obj->transform, (vec3) { -Scene.bot->obj->transform[3][0], -Scene.bot->obj->transform[3][1], -1000.0f });
+		worldSetCamera(world, o);
+		make_view(1);
+		make_projection(1);
+		glViewport(0, height/2, width/2, height/2);
+		worldRender(world);
+
+		glm_mat4_identity(o->obj->transform);
+		glm_translate(o->obj->transform, (vec3) { -Scene.bot->obj->transform[3][2], -Scene.bot->obj->transform[3][1], -1000.0f });
+		glm_rotate(o->obj->transform, glm_rad(90), (vec3) { .0f, 1.0f, .0f });
+		make_view(2);
+		make_projection(2);
+		glViewport(width/2, height/2, width/2, height/2);
+		worldRender(world);
+
+		glm_mat4_identity(o->obj->transform);
+		glm_translate(o->obj->transform, (vec3) { -Scene.bot->obj->transform[3][0], -Scene.bot->obj->transform[3][2], -1000.0f });
+		glm_rotate(o->obj->transform, glm_rad(90), (vec3) { 1.0f, .0f, .0f });
+		make_view(3);
+		make_projection(3);
+		glViewport(0, 0, width/2, height/2);
+		worldRender(world);
+		worldSetCamera(world, Scene.cameras[0]);
+		break;
+	case CAM_Z:
+		worldSetCamera(world, o);
+		glm_translate(o->obj->transform, (vec3) { -Scene.bot->obj->transform[3][0], -Scene.bot->obj->transform[3][1], -1000.0f });
+		make_view(1);
+		make_projection(1);
+		glViewport(0, 0, width, height);
+		worldRender(world);
+		break;
+
+	case CAM_Y:
+		worldSetCamera(world, o);
+		glm_translate(o->obj->transform, (vec3) { -Scene.bot->obj->transform[3][2], -Scene.bot->obj->transform[3][1], -1000.0f });
+		glm_rotate(o->obj->transform, glm_rad(-90), (vec3) { .0f, 1.0f, .0f });
+		make_view(2);
+		make_projection(2);
+		glViewport(0, 0 , width, height);
+		worldRender(world);
+		break;
+
+	case CAM_X:
+		worldSetCamera(world, o);
+		glm_translate(o->obj->transform, (vec3) { -Scene.bot->obj->transform[3][0], -Scene.bot->obj->transform[3][2], -1000.0f });
+		glm_rotate(o->obj->transform, glm_rad(90), (vec3) { 1.0f, .0f, .0f });
+		make_view(3);
+		make_projection(3);
+		glViewport(0, 0, width, height);
+		worldRender(world);
+		break;
+
+	case CAM_PERSPECTIVE:
+		world->bUseCamera = 1;
+		worldSetCamera(world, Scene.cameras[Scene.currentCamera]);
+		make_view(4);
+		make_projection(4);
+		glViewport(0, 0, width, height);
+		worldRender(world);
+		break;
+
+	}
+
+	glm_mat4_identity(o->obj->transform);
 
 	objDebug->render(objDebug);
 	
@@ -173,46 +314,14 @@ void reshapeCallback(int w, int h) {
 	mouse_center_x = window_wid >> 1;
 	mouse_center_y = window_hei >> 1;
 
-	double aspectRatio = (double) w / (double) h;
+	aspectRatio = (double) w / (double) h;
 
-	switch (camera_mode) {
-	case CAM_ALL:
-		// Set up the first viewport
-		glViewport(0, h / 2, w / 2, h / 2);
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
-		gluPerspective(world->cam->fov, aspectRatio, world->cam->zNear, world->cam->zFar);
-		glMatrixMode(GL_MODELVIEW);
-		glLoadIdentity();
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluPerspective(120, aspectRatio, world->cam->zNear, world->cam->zFar);
 
-		// Set up the second viewport
-		glViewport(w / 2, 0, w / 2, h / 2);
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
-		gluPerspective(world->cam->fov, aspectRatio, world->cam->zNear, world->cam->zFar);
-		glMatrixMode(GL_MODELVIEW);
-		glLoadIdentity();
-
-		break;
-
-	case CAM_Z:
-		break;
-
-	case CAM_Y:
-		break;
-
-	case CAM_X:
-		break;
-
-	default:
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
-		gluPerspective(world->cam->fov, aspectRatio, world->cam->zNear, world->cam->zFar);
-
-		glViewport(0, 0, w, h);
-		glMatrixMode(GL_MODELVIEW);
-		break;
-	}
+	glViewport(0, 0, w, h);
+	glMatrixMode(GL_MODELVIEW);
 }
 
 void enginePause() {

@@ -1,6 +1,7 @@
 #include "RoboBeach.h"
 
 #include "Engine.h"
+#include "utils/Shapes.h"
 
 int runRoboBeach(int* argc, char** argv) {
 	engineInit(argc, argv);
@@ -79,6 +80,12 @@ void setupObjects() {
 	worldSpawnObj(world, Scene.fan1->obj);
 	glm_translate(Scene.fan1->obj->transform, (vec3) { -2.0f, 2.0f, 2.0f });
 
+	Scene.axis = newObject();
+	check(Scene.axis);
+	Scene.axis->render = axisRender;
+	worldSpawnObj(world, Scene.axis);
+	glm_scale(Scene.axis->transform, (vec3) { .3f, .3f, .3f });
+
 	Scene.bot = newRobot();
 	check(Scene.bot);
 	worldSpawnObj(world, Scene.bot->obj);
@@ -89,9 +96,19 @@ void setupObjects() {
 	glm_vec3_copy((vec3) { 0.0f, 0.0f, -1.0f }, Scene.bot->cam->camFront);
 	glm_vec3_copy((vec3) { 0.0f, 1.0f, 0.0f }, Scene.bot->cam->camUp);
 	glm_vec3_copy((vec3) { 0.0f, -90.0f, 0.0f }, Scene.bot->cam->camRot);
+
+	Scene.cameras[1] = newCamera();
+	check(Scene.cameras[1]);
+	Scene.cameras[1]->obj->update = fpsCamUpdate;
+	glm_vec3_copy((vec3) { 0.0f, 0.0f, 3.0f }, Scene.cameras[1]->camPosition);
+	glm_vec3_copy((vec3) { 0.0f, 0.0f, -1.0f }, Scene.cameras[1]->camFront);
+	glm_vec3_copy((vec3) { 0.0f, 1.0f, 0.0f }, Scene.cameras[1]->camUp);
+	glm_vec3_copy((vec3) { 0.0f, -90.0f, 0.0f }, Scene.cameras[1]->camRot);
 	
 	Scene.currentCamera = 0;
 	worldSetCamera(world, Scene.cameras[Scene.currentCamera]);
+
+	fov = 60.0f;
 }
 
 void setupInputMapping() {
@@ -110,17 +127,32 @@ void setupInputMapping() {
 	imMapActionKey('v', KEY_PRESS, rbSwitchCamera);
 	imMapActionKey('z', KEY_PRESS, rbShowCollision);
 	imMapActionKey('t', KEY_PRESS, rbThrow);
+	imMapFloat1Key('i', KEY_HOLD, rbZoom, 1);
+	imMapFloat1Key('o', KEY_HOLD, rbZoom, -1);
+	imMapActionKey('b', KEY_PRESS, rbSwitchView);
+
 }
 
 void rbMove(float forward, float side) {
-	botMoving(Scene.bot, forward, side);
+	if (Scene.currentCamera == 1) {
+		if (forward != 0.0f) Scene.cameras[1]->forwardVal = forward;
+		if (side != 0.0f) Scene.cameras[1]->sideVal = side;
+	}
+	else {
+		botMoving(Scene.bot, forward, side);
+	}
 }
 
 void rbRotate(float pitch, float yaw) {
-	if (Scene.currentCamera == 0) {
+	if (Scene.currentCamera == 1) {
+		if (pitch != 0) world->cam->pitchVal += pitch;
+		if (yaw != 0) world->cam->yawVal += yaw;
+	}
+	else {
 		if (pitch != 0) world->cam->pitchVal -= pitch;
 		if (yaw != 0) world->cam->yawVal += yaw;
 	}
+	
 }
 
 void rbJump() {
@@ -161,4 +193,85 @@ void rbPause() {
 
 void rbShowCollision() {
 	worldToggleCollisionVision(world);
+}
+
+void rbZoom(float val) {
+	Scene.cameras[0]->fov -= val;
+	fov += val;
+}
+
+void rbSwitchView() {
+	Scene.currentCamera = !Scene.currentCamera;
+}
+
+void axisRender(Object* obj) {
+	glPushMatrix();
+	glLineWidth(1.0f);
+
+	glLineWidth(10.0f);
+	glColor3f(1.0f, .0f, .0f);
+	glBegin(GL_LINES);
+	glVertex3f(.0f, .0f, .0f);
+	glVertex3f(5.0f, .0f, .0f);
+	glEnd();
+
+	glColor3f(.0f, 1.0f, .0f);
+	glBegin(GL_LINES);
+	glVertex3f(.0f, .0f, .0f);
+	glVertex3f(.0f, 5.0f, .0f);
+	glEnd();
+
+	glColor3f(.0f, .0f, 1.0f);
+	glBegin(GL_LINES);
+	glVertex3f(.0f, .0f, .0f);
+	glVertex3f(.0f, .0f, 5.0f);
+	glEnd();
+
+	glLineWidth(1.0f);
+	glScalef(.3f, .3f, .3f);
+	drawUnitSphere(16, 16);
+
+	glPopMatrix();
+}
+
+void fpsCamUpdate(Object* obj, float deltatime) {
+	mat4 worldTrans;
+	objGetWorldTransform(worldTrans, obj);
+
+	Camera* cam = cast(obj, CAMERA);
+	cam->camRot[0] = fmod(cam->camRot[0], 360.0f);
+	cam->camRot[1] = fmod(cam->camRot[1], 360.0f);
+	cam->camRot[2] = fmod(cam->camRot[2], 360.0f);
+
+	float lastPitch = cam->camRot[0];
+	cam->camRot[0] += cam->pitchVal * deltatime * cam->pitchSensitivity;
+	cam->camRot[1] += cam->yawVal * deltatime * cam->yawSensitivity;
+	if (cam->camRot[0] > 90 || cam->camRot[0] < -90) {
+		cam->camRot[0] = lastPitch;
+	}
+
+	vec3 dir = {
+		cosf(glm_rad(cam->camRot[1])) * cosf(glm_rad(cam->camRot[0])),
+		sinf(glm_rad(cam->camRot[0])),
+		sinf(glm_rad(cam->camRot[1])) * cosf(glm_rad(cam->camRot[0]))
+	};
+	glm_vec3_normalize_to(dir, cam->camFront);
+
+	// camPosition += movSpeed (scalar) * forwardVal (scalar) * camFront (vec3);
+	glm_vec3_muladds(cam->camFront, cam->obj->movSpeed * cam->forwardVal * deltatime, cam->camPosition);
+
+	// camPosition -= normalize(camFront X camUp) * movSpeed * sideVal;
+	vec3 frontXup;
+	glm_vec3_crossn(cam->camFront, cam->camUp, frontXup);
+	glm_vec3_muladds(frontXup, cam->obj->movSpeed * cam->sideVal * deltatime, cam->camPosition);
+
+	vec3 frontPos;
+	glm_vec3_add(cam->camPosition, cam->camFront, frontPos);
+
+	glm_lookat(cam->camPosition, frontPos, cam->camUp, cam->obj->transform);
+
+	cam->forwardVal *= cam->moveFraction;
+	cam->sideVal *= cam->moveFraction;
+	cam->pitchVal *= cam->rotateFraction;
+	cam->yawVal *= cam->rotateFraction;
 }

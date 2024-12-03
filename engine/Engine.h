@@ -30,6 +30,8 @@ World* world;
 
 DebugText* objDebug;
 
+Camera* o;
+
 // camera mode
 #define CAM_PERSPECTIVE		0
 #define CAM_Z				1

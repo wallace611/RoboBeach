@@ -8,6 +8,7 @@ typedef struct _world {
 	Camera* cam;
 	ObjContainer* instances;
 	ObjContainer* collisionList;
+	unsigned char bUseCamera;
 } World;
 
 World* newWorld();

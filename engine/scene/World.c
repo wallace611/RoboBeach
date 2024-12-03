@@ -9,11 +9,13 @@ World* newWorld() {
 
     world->instances = newObjContainer();
     world->collisionList = newObjContainer();
+    world->bUseCamera = 1;
     return world;
 }
 
 void worldUpdate(World* world, float deltatime) {
-    world->cam->obj->update(world->cam->obj, deltatime);
+    if (world->bUseCamera)
+        world->cam->obj->update(world->cam->obj, deltatime);
     for (int i = 0; i < (size_t) world->instances->end; i++) {
         Object* obj = cast(world->instances->list[i], OBJECT);
         obj->update(world->instances->list[i], deltatime);
@@ -24,7 +26,9 @@ void worldRender(World* world) {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    world->cam->obj->render(world->cam->obj);
+    glPushMatrix();
+    if (world->bUseCamera)
+        world->cam->obj->render(world->cam->obj);
 
     for (int i = 0; i < (size_t) world->instances->end; i++) {
         Object* obj = cast(world->instances->list[i], OBJECT);
@@ -34,6 +38,7 @@ void worldRender(World* world) {
         Object* obj = ((CollisionShape*)world->collisionList->list[i])->obj;
         obj->render(obj);
     }
+    glPopMatrix();
 }
 
 int worldSpawnObj(World* world, Object* obj) {

@@ -103,7 +103,7 @@ foreach(ex IN LISTS Examples)
         "code/RoboBeach.c"
         "code/RoboBeach.h" 
         "code/Test.h"
-     "code/object/Umbrella.h" "code/object/Umbrella.c" "code/object/Fan.h" "code/object/Fan.c")
+     "code/object/Umbrella.h" "code/object/Umbrella.c" "code/object/Fan.h" "code/object/Fan.c"  )
     target_link_libraries(${ex} PRIVATE GLUT::GLUT)
 
     if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
