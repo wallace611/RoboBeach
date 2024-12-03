@@ -30,6 +30,15 @@ World* world;
 
 DebugText* objDebug;
 
+// camera mode
+#define CAM_PERSPECTIVE		0
+#define CAM_Z				1
+#define CAM_Y				2
+#define CAM_X				3
+#define CAM_ALL				4
+
+int camera_mode;
+
 // engine functions
 void engineInit(int* argc, char** argv);
 void engineRenderInit();
@@ -43,7 +52,7 @@ static void tick(float deltatime);
 // callback functions
 static void displayCallback();
 static void idleCallback();
-static void reshapeCallback(int w, int h);
+void reshapeCallback(int w, int h);
 
 void moving(float x, float y);
 void rotating(float pitch, float yaw);

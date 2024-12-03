@@ -9,6 +9,8 @@
 #include "object/Camera.h"
 #include "object/Object.h"
 
+#include "RoboBeach.h"
+
 void engineInit(int* argc, char** argv) {
 	target_delta_nano = (long long) 1e9 / ENG_DEFAULT_FPS;
 	current_fps = 0.0f;
@@ -173,12 +175,44 @@ void reshapeCallback(int w, int h) {
 
 	double aspectRatio = (double) w / (double) h;
 
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluPerspective(world->cam->fov, aspectRatio, world->cam->zNear, world->cam->zFar);
+	switch (camera_mode) {
+	case CAM_ALL:
+		// Set up the first viewport
+		glViewport(0, h / 2, w / 2, h / 2);
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		gluPerspective(world->cam->fov, aspectRatio, world->cam->zNear, world->cam->zFar);
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
 
-	glViewport(0, 0, w, h);
-	glMatrixMode(GL_MODELVIEW);
+		// Set up the second viewport
+		glViewport(w / 2, 0, w / 2, h / 2);
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		gluPerspective(world->cam->fov, aspectRatio, world->cam->zNear, world->cam->zFar);
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
+
+		break;
+
+	case CAM_Z:
+		break;
+
+	case CAM_Y:
+		break;
+
+	case CAM_X:
+		break;
+
+	default:
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		gluPerspective(world->cam->fov, aspectRatio, world->cam->zNear, world->cam->zFar);
+
+		glViewport(0, 0, w, h);
+		glMatrixMode(GL_MODELVIEW);
+		break;
+	}
 }
 
 void enginePause() {

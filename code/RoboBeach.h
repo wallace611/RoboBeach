@@ -22,7 +22,7 @@ struct _scene {
 	
 	Robot* bot;
 	unsigned int currentCamera;
-	Camera* cameras[2];
+	Camera* cameras[4];
 } Scene;
 
 int runRoboBeach(int* argc, char** argv);

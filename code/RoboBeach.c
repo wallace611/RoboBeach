@@ -85,8 +85,11 @@ void setupObjects() {
 	glm_translate(Scene.bot->obj->transform, (vec3) { .0f, 2.0f, .0f });
 
 	Scene.cameras[0] = Scene.bot->cam;
-	Scene.cameras[1] = newCamera();
-	check(Scene.cameras[1]);
+	glm_vec3_copy((vec3) { 0.0f, 0.0f, 3.0f }, Scene.bot->cam->camPosition);
+	glm_vec3_copy((vec3) { 0.0f, 0.0f, -1.0f }, Scene.bot->cam->camFront);
+	glm_vec3_copy((vec3) { 0.0f, 1.0f, 0.0f }, Scene.bot->cam->camUp);
+	glm_vec3_copy((vec3) { 0.0f, -90.0f, 0.0f }, Scene.bot->cam->camRot);
+	
 	Scene.currentCamera = 0;
 	worldSetCamera(world, Scene.cameras[Scene.currentCamera]);
 }
@@ -110,21 +113,11 @@ void setupInputMapping() {
 }
 
 void rbMove(float forward, float side) {
-	if (Scene.currentCamera == 1) {
-		if (forward != 0) world->cam->forwardVal = forward;
-		if (side != 0) world->cam->sideVal = side;
-	}
-	else {
-		botMoving(Scene.bot, forward, side);
-	}
+	botMoving(Scene.bot, forward, side);
 }
 
 void rbRotate(float pitch, float yaw) {
-	if (Scene.currentCamera == 1) {
-		if (pitch != 0) world->cam->pitchVal += pitch;
-		if (yaw != 0) world->cam->yawVal += yaw;
-	}
-	else {
+	if (Scene.currentCamera == 0) {
 		if (pitch != 0) world->cam->pitchVal -= pitch;
 		if (yaw != 0) world->cam->yawVal += yaw;
 	}
@@ -135,8 +128,10 @@ void rbJump() {
 }
 
 void rbSwitchCamera() {
-	Scene.currentCamera = (Scene.currentCamera + 1) % 2;
-	worldSetCamera(world, Scene.cameras[Scene.currentCamera]);
+	camera_mode = (camera_mode + 1) % 5;
+	reshapeCallback(window_wid, window_hei);
+	//Scene.currentCamera = (Scene.currentCamera + 1) % 4;
+	//worldSetCamera(world, Scene.cameras[Scene.currentCamera]);
 }
 
 void rbKneeDown() {
