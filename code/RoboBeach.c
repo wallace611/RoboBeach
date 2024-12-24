@@ -22,6 +22,7 @@ void setupObjects() {
 	Scene.sand->color[0] = .76f;
 	Scene.sand->color[1] = .76f;
 	Scene.sand->color[2] = .33f;
+	Scene.sand->type = 0;
 	glm_translate(Scene.sand->obj->transform, (vec3) { .0f, -2.0f, -15.0f });
 	glm_scale(Scene.sand->obj->transform, (vec3) { 50.0f, 1.0f, 50.0f });
 
@@ -31,6 +32,7 @@ void setupObjects() {
 	Scene.water->color[0] = .33f;
 	Scene.water->color[1] = .47f;
 	Scene.water->color[2] = .76f;
+	Scene.water->type = 1;
 	glm_translate(Scene.water->obj->transform, (vec3) { .0f, -2.0f, 35.0f });
 	glm_scale(Scene.water->obj->transform, (vec3) { 50.0f, 1.0f, 50.0f });
 	glm_translate(Scene.water->csCollide->obj->transform, (vec3) { .0f, -2.0f, .0f });
@@ -74,6 +76,30 @@ void setupObjects() {
 	check(Scene.umb6);
 	worldSpawnObj(world, Scene.umb6->obj);
 	glm_translate(Scene.umb6->obj->transform, (vec3) { 0.0f, 2.0f, -20.0f });
+
+	Scene.light1 = newLight(GL_LIGHT0);
+	check(Scene.light1);
+	worldSpawnObj(world, Scene.light1->obj);
+	glm_translate(Scene.light1->obj->transform, (vec3) { .0f, .0f, -10.0f });
+
+	Scene.sun = newLight(GL_LIGHT1);
+	check(Scene.sun);
+	worldSpawnObj(world, Scene.sun->obj);
+	Scene.sun->type = 0;
+	glm_translate(Scene.sun->obj->transform, (vec3) { .0f, 1.0f, .0f });
+	Scene.sun->ambient[0] = .5f;
+	Scene.sun->ambient[1] = .5f;
+	Scene.sun->ambient[2] = .3f;
+	Scene.sun->ambient[3] = 1.0f;
+	Scene.sun->diffuse[0] = .3f;
+	Scene.sun->diffuse[1] = .3f;
+	Scene.sun->diffuse[2] = .3f;
+	Scene.sun->diffuse[3] = 1.0f;
+	Scene.sun->specular[0] = 1.0f;
+	Scene.sun->specular[1] = 1.0f;
+	Scene.sun->specular[2] = 1.0f;
+	Scene.sun->specular[3] = 1.0f;
+	Scene.sun->obj->update = sunUpdate;
 
 	Scene.fan1 = newFan();
 	check(Scene.fan1);
@@ -205,6 +231,7 @@ void rbSwitchView() {
 }
 
 void axisRender(Object* obj) {
+	glDisable(GL_LIGHTING);
 	glPushMatrix();
 	glLineWidth(1.0f);
 
@@ -231,6 +258,7 @@ void axisRender(Object* obj) {
 	glScalef(.3f, .3f, .3f);
 	drawUnitSphere(16, 16);
 
+	glEnable(GL_LIGHTING);
 	glPopMatrix();
 }
 
@@ -274,4 +302,17 @@ void fpsCamUpdate(Object* obj, float deltatime) {
 	cam->sideVal *= cam->moveFraction;
 	cam->pitchVal *= cam->rotateFraction;
 	cam->yawVal *= cam->rotateFraction;
+}
+
+void sunUpdate(Object* obj, float deltatime) {
+	static float angle = 0.0f; 
+	angle += deltatime; 
+
+	float x = cos(angle); 
+	float y = sin(angle); 
+	float z = 0.0f;     
+
+	obj->transform[3][0] = x;
+	obj->transform[3][1] = y;
+	obj->transform[3][2] = z;
 }

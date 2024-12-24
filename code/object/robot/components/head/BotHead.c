@@ -19,76 +19,75 @@ BotHead* newBotHead() {
 }
 
 void bheadRender(Component* obj) {
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
 
-	glMultMatrixf(obj->transform);
+    // Apply the object's transformation matrix
+    glMultMatrixf(obj->transform);
 
-	glPushMatrix();
-	
-	glScalef(.5f, .6f, .4f);
-	glBegin(GL_QUADS);
-	{
-		// bottom
-		glColor3f(.5f, .5f, .5f);
-		glVertex3f(.5f, -.5f, .5f);
-		glVertex3f(-.5f, -.5f, .5f);
-		glVertex3f(-.5f, -.5f, -.5f);
-		glVertex3f(.5f, -.5f, -.5f);
+    glPushMatrix();
+    glScalef(0.5f, 0.6f, 0.4f);
 
-		// top
-		glColor3f(.65f, .65f, .65f);
-		glVertex3f(.5f, .5f, .5f);
-		glVertex3f(.5f, .5f, -.5f);
+    glBegin(GL_QUADS);
+    {
+        // Bottom face (normal: (0, -1, 0))
+        glNormal3f(0.0f, -1.0f, 0.0f);
+        glColor3f(0.5f, 0.5f, 0.5f);
+        glVertex3f(0.5f, -0.5f, 0.5f);
+        glVertex3f(-0.5f, -0.5f, 0.5f);
+        glVertex3f(-0.5f, -0.5f, -0.5f);
+        glVertex3f(0.5f, -0.5f, -0.5f);
 
-		glColor3f(.7f, .7f, .7f);
-		glVertex3f(-.5f, .5f, -.5f);
-		glVertex3f(-.5f, .5f, .5f);
+        // Top face (normal: (0, 1, 0))
+        glNormal3f(0.0f, 1.0f, 0.0f);
+        glColor3f(0.65f, 0.65f, 0.65f);
+        glVertex3f(0.5f, 0.5f, 0.5f);
+        glVertex3f(0.5f, 0.5f, -0.5f);
+        glColor3f(0.7f, 0.7f, 0.7f);
+        glVertex3f(-0.5f, 0.5f, -0.5f);
+        glVertex3f(-0.5f, 0.5f, 0.5f);
 
-		// front
-		glColor3f(.65f, .65f, .65f);
-		glVertex3f(.5f, .5f, .5f);
+        // Front face (normal: (0, 0, 1))
+        glNormal3f(0.0f, 0.0f, 1.0f);
+        glColor3f(0.65f, 0.65f, 0.65f);
+        glVertex3f(0.5f, 0.5f, 0.5f);
+        glColor3f(0.7f, 0.7f, 0.7f);
+        glVertex3f(-0.5f, 0.5f, 0.5f);
+        glColor3f(0.5f, 0.5f, 0.5f);
+        glVertex3f(-0.5f, -0.5f, 0.5f);
+        glVertex3f(0.5f, -0.5f, 0.5f);
 
-		glColor3f(.7f, .7f, .7f);
-		glVertex3f(-.5f, .5f, .5f);
+        // Back face (normal: (0, 0, -1))
+        glNormal3f(0.0f, 0.0f, -1.0f);
+        glColor3f(0.65f, 0.65f, 0.65f);
+        glVertex3f(0.5f, 0.5f, -0.5f);
+        glColor3f(0.5f, 0.5f, 0.5f);
+        glVertex3f(0.5f, -0.5f, -0.5f);
+        glVertex3f(-0.5f, -0.5f, -0.5f);
+        glColor3f(0.7f, 0.7f, 0.7f);
+        glVertex3f(-0.5f, 0.5f, -0.5f);
 
-		glColor3f(.5f, .5f, .5f);
-		glVertex3f(-.5f, -.5f, .5f);
-		glVertex3f(.5f, -.5f, .5f);
+        // Left face (normal: (1, 0, 0))
+        glNormal3f(1.0f, 0.0f, 0.0f);
+        glColor3f(0.65f, 0.65f, 0.65f);
+        glVertex3f(0.5f, 0.5f, 0.5f);
+        glColor3f(0.5f, 0.5f, 0.5f);
+        glVertex3f(0.5f, -0.5f, 0.5f);
+        glVertex3f(0.5f, -0.5f, -0.5f);
+        glColor3f(0.65f, 0.65f, 0.65f);
+        glVertex3f(0.5f, 0.5f, -0.5f);
 
-		// back
-		glColor3f(.65f, .65f, .65f);
-		glVertex3f(.5f, .5f, -.5f);
+        // Right face (normal: (-1, 0, 0))
+        glNormal3f(-1.0f, 0.0f, 0.0f);
+        glColor3f(0.7f, 0.7f, 0.7f);
+        glVertex3f(-0.5f, 0.5f, 0.5f);
+        glVertex3f(-0.5f, 0.5f, -0.5f);
+        glColor3f(0.5f, 0.5f, 0.5f);
+        glVertex3f(-0.5f, -0.5f, -0.5f);
+        glVertex3f(-0.5f, -0.5f, 0.5f);
+    }
+    glEnd();
 
-		glColor3f(.5f, .5f, .5f);
-		glVertex3f(.5f, -.5f, -.5f);
-		glVertex3f(-.5f, -.5f, -.5f);
-
-		glColor3f(.7f, .7f, .7f);
-		glVertex3f(-.5f, .5f, -.5f);
-
-		// left
-		glColor3f(.65f, .65f, .65f);
-		glVertex3f(.5f, .5f, .5f);
-
-		glColor3f(.5f, .5f, .5f);
-		glVertex3f(.5f, -.5f, .5f);
-		glVertex3f(.5f, -.5f, -.5f);
-
-		glColor3f(.65f, .65f, .65f);
-		glVertex3f(.5f, .5f, -.5f);
-
-		// right
-		glColor3f(.7f, .7f, .7f);
-		glVertex3f(-.5f, .5f, .5f);
-		glVertex3f(-.5f, .5f, -.5f);
-		glColor3f(.5f, .5f, .5f);
-		glVertex3f(-.5f, -.5f, -.5f);
-		glVertex3f(-.5f, -.5f, .5f);
-	}
-	glEnd();
-
-	glPopMatrix();
-
-	glPopMatrix();
+    glPopMatrix(); // End head rendering
+    glPopMatrix(); // Restore previous matrix state
 }

@@ -48,11 +48,24 @@ void rockRender(Object* obj) {
 	glMultMatrixf(obj->transform);
 
 	glPushMatrix();
-    glColor3f(0.5f, 0.35f, 0.05f); 
+
+	// 設置岩石材質
+	GLfloat rockAmbient[] = { 0.3f, 0.2f, 0.1f, 1.0f };  // 環境光 (暗棕色)
+	GLfloat rockDiffuse[] = { 0.5f, 0.35f, 0.2f, 1.0f }; // 漫射光 (中棕色)
+	GLfloat rockSpecular[] = { 0.1f, 0.1f, 0.1f, 1.0f }; // 高光反射 (微弱的光澤)
+	GLfloat rockShininess = 10.0f;                        // 光澤度 (低光澤)
+
+	glMaterialfv(GL_FRONT, GL_AMBIENT, rockAmbient);
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, rockDiffuse);
+	glMaterialfv(GL_FRONT, GL_SPECULAR, rockSpecular);
+	glMaterialf(GL_FRONT, GL_SHININESS, rockShininess);
+
+	// 繪製岩石 (球體)
 	glutSolidSphere(1.0f, 16, 16);
 
 	glPopMatrix();
 
+	// 繪製子對象
 	objRenderChild(obj);
 
 	glPopMatrix();

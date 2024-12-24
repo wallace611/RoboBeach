@@ -27,81 +27,100 @@ void bbodyRender(Component* obj) {
 	glPushMatrix();
 	glMultMatrixf(obj->transform);
 
-	// body
+	// 設置金屬材質屬性
+	GLfloat materialAmbient[] = { 0.25f, 0.25f, 0.25f, 1.0f };
+	GLfloat materialDiffuse[] = { 0.2f, 0.2f, 0.2f, 1.0f };
+	GLfloat materialSpecular[] = { 0.50f, 0.77f, 0.77f, 1.0f };
+	GLfloat materialShininess[] = { 80.0f };
+
+	glMaterialfv(GL_FRONT, GL_AMBIENT, materialAmbient);
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, materialDiffuse);
+	glMaterialfv(GL_FRONT, GL_SPECULAR, materialSpecular);
+	glMaterialfv(GL_FRONT, GL_SHININESS, materialShininess);
+
+	// Body
 	glPushMatrix();
 	glScalef(1.0f, 1.0f, 0.5f);
 	glBegin(GL_QUADS);
 	{
-		// bottom
-		glColor3f(.5f, .5f, .5f);
-		glVertex3f(.5f, -.5f, .5f);
-		glVertex3f(-.5f, -.5f, .5f);
-		glVertex3f(-.5f, -.5f, -.5f);
-		glVertex3f(.5f, -.5f, -.5f);
+		// Bottom face (normal: (0, -1, 0))
+		glNormal3f(0.0f, -1.0f, 0.0f);
+		//glColor3f(.5f, .5f, .5f);
+		glVertex3f(0.5f, -0.5f, 0.5f);
+		glVertex3f(-0.5f, -0.5f, 0.5f);
+		glVertex3f(-0.5f, -0.5f, -0.5f);
+		glVertex3f(0.5f, -0.5f, -0.5f);
 
-		// top
-		glColor3f(.65f, .65f, .65f);
-		glVertex3f(.5f, .5f, .5f);
-		glVertex3f(.5f, .5f, -.5f);
+		// Top face (normal: (0, 1, 0))
+		glNormal3f(0.0f, 1.0f, 0.0f);
+		//glColor3f(.65f, .65f, .65f);
+		glVertex3f(0.5f, 0.5f, 0.5f);
+		glVertex3f(0.5f, 0.5f, -0.5f);
 
-		glColor3f(.7f, .7f, .7f);
-		glVertex3f(-.5f, .5f, -.5f);
-		glVertex3f(-.5f, .5f, .5f);
+		//glColor3f(.7f, .7f, .7f);
+		glVertex3f(-0.5f, 0.5f, -0.5f);
+		glVertex3f(-0.5f, 0.5f, 0.5f);
 
-		// front
-		glColor3f(.65f, .65f, .65f);
-		glVertex3f(.5f, .5f, .5f);
+		// Front face (normal: (0, 0, 1))
+		glNormal3f(0.0f, 0.0f, 1.0f);
+		//glColor3f(.65f, .65f, .65f);
+		glVertex3f(0.5f, 0.5f, 0.5f);
 
-		glColor3f(.7f, .7f, .7f);
-		glVertex3f(-.5f, .5f, .5f);
+		//glColor3f(.7f, .7f, .7f);
+		glVertex3f(-0.5f, 0.5f, 0.5f);
 
-		glColor3f(.5f, .5f, .5f);
-		glVertex3f(-.5f, -.5f, .5f);
-		glVertex3f(.5f, -.5f, .5f);
+		//glColor3f(.5f, .5f, .5f);
+		glVertex3f(-0.5f, -0.5f, 0.5f);
+		glVertex3f(0.5f, -0.5f, 0.5f);
 
-		// back
-		glColor3f(.65f, .65f, .65f);
-		glVertex3f(.5f, .5f, -.5f);
+		// Back face (normal: (0, 0, -1))
+		glNormal3f(0.0f, 0.0f, -1.0f);
+		//glColor3f(.65f, .65f, .65f);
+		glVertex3f(0.5f, 0.5f, -0.5f);
 
-		glColor3f(.5f, .5f, .5f);
-		glVertex3f(.5f, -.5f, -.5f);
-		glVertex3f(-.5f, -.5f, -.5f);
+		//glColor3f(.5f, .5f, .5f);
+		glVertex3f(0.5f, -0.5f, -0.5f);
+		glVertex3f(-0.5f, -0.5f, -0.5f);
 
-		glColor3f(.7f, .7f, .7f);
-		glVertex3f(-.5f, .5f, -.5f);
+		//glColor3f(.7f, .7f, .7f);
+		glVertex3f(-0.5f, 0.5f, -0.5f);
 
-		// left
-		glColor3f(.65f, .65f, .65f);
-		glVertex3f(.5f, .5f, .5f);
+		// Left face (normal: (1, 0, 0))
+		glNormal3f(1.0f, 0.0f, 0.0f);
+		//glColor3f(.65f, .65f, .65f);
+		glVertex3f(0.5f, 0.5f, 0.5f);
 
-		glColor3f(.5f, .5f, .5f);
-		glVertex3f(.5f, -.5f, .5f);
-		glVertex3f(.5f, -.5f, -.5f);
+		//glColor3f(.5f, .5f, .5f);
+		glVertex3f(0.5f, -0.5f, 0.5f);
+		glVertex3f(0.5f, -0.5f, -0.5f);
 
-		glColor3f(.65f, .65f, .65f);
-		glVertex3f(.5f, .5f, -.5f);
+		//glColor3f(.65f, .65f, .65f);
+		glVertex3f(0.5f, 0.5f, -0.5f);
 
-		// right
-		glColor3f(.7f, .7f, .7f);
-		glVertex3f(-.5f, .5f, .5f);
-		glVertex3f(-.5f, .5f, -.5f);
-		glColor3f(.5f, .5f, .5f);
-		glVertex3f(-.5f, -.5f, -.5f);
-		glVertex3f(-.5f, -.5f, .5f);
+		// Right face (normal: (-1, 0, 0))
+		glNormal3f(-1.0f, 0.0f, 0.0f);
+		//glColor3f(.7f, .7f, .7f);
+		glVertex3f(-0.5f, 0.5f, 0.5f);
+		glVertex3f(-0.5f, 0.5f, -0.5f);
+		//glColor3f(.5f, .5f, .5f);
+		glVertex3f(-0.5f, -0.5f, -0.5f);
+		glVertex3f(-0.5f, -0.5f, 0.5f);
 	}
 	glEnd();
 	glPopMatrix();
 
-	// neck
+	// Neck
 	glPushMatrix();
-	glTranslatef(0.0f, .4f, 0.0f);
-	glRotatef(90.0f, -1.0f, .0f, .0f);
-	glutSolidCylinder(.07, .3, 10, 10);
+	glTranslatef(0.0f, 0.4f, 0.0f);
+	glRotatef(90.0f, -1.0f, 0.0f, 0.0f);
+	glutSolidCylinder(0.07, 0.3, 10, 10);
 	glPopMatrix();
 
+	// Render child components
 	compRenderChild(obj);
 	glPopMatrix();
 }
+
 
 void build_body_part(BotBody* bbody) {
 	// head

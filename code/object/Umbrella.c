@@ -66,20 +66,49 @@ void umbRender(Object* obj) {
 
 	glPushMatrix();
 	{
+		// 雨傘柄
 		glTranslatef(.0f, -.5f, .0f);
 		glRotatef(90.0f, -1.0f, .0f, .0f);
-		glColor3f(.7f, .7f, .7f);
+
+		// 設置雨傘柄的材質屬性
+		GLfloat handleAmbient[] = { 0.3f, 0.3f, 0.3f, 1.0f };
+		GLfloat handleDiffuse[] = { 0.7f, 0.7f, 0.7f, 1.0f };
+		GLfloat handleSpecular[] = { 0.9f, 0.9f, 0.9f, 1.0f };
+		GLfloat handleShininess = 50.0f;
+
+		glMaterialfv(GL_FRONT, GL_AMBIENT, handleAmbient);
+		glMaterialfv(GL_FRONT, GL_DIFFUSE, handleDiffuse);
+		glMaterialfv(GL_FRONT, GL_SPECULAR, handleSpecular);
+		glMaterialf(GL_FRONT, GL_SHININESS, handleShininess);
+
+		// 繪製雨傘柄
 		glutSolidCylinder(.1, 4.0, 8, 8);
+
+		// 移動到傘面位置
 		glTranslatef(.0f, .0f, 4.0f);
-		glColor3f(.3f, .2f, .8f);
+
+		// 設置雨傘面的材質屬性
+		GLfloat canopyAmbient[] = { 0.2f, 0.1f, 0.5f, 1.0f };
+		GLfloat canopyDiffuse[] = { 0.3f, 0.2f, 0.8f, 1.0f };
+		GLfloat canopySpecular[] = { 0.1f, 0.1f, 0.1f, 1.0f };
+		GLfloat canopyShininess = 3.0f;
+
+		glMaterialfv(GL_FRONT, GL_AMBIENT, canopyAmbient);
+		glMaterialfv(GL_FRONT, GL_DIFFUSE, canopyDiffuse);
+		glMaterialfv(GL_FRONT, GL_SPECULAR, canopySpecular);
+		glMaterialf(GL_FRONT, GL_SHININESS, canopyShininess);
+
+		// 繪製雨傘面
 		glutSolidCylinder(3.0, .1, 16, 16);
 	}
 	glPopMatrix();
 
+	// 繪製子對象
 	objRenderChild(obj);
 
 	glPopMatrix();
 }
+
 
 void botTouchFloor(Object* self, CollisionShape* selfcs, Object* other, CollisionShape* othercs) {
 	if (other == NULL || othercs == NULL || self == other) return;

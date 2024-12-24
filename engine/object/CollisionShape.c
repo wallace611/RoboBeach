@@ -32,6 +32,7 @@ void csUpdate(Object* obj, float deltatime) {
 void csRender(Object* obj) {
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
+    glDisable(GL_LIGHTING);
 
     CollisionShape* cs = cast(obj, COLLISION);
     if (cs != NULL && cs->bIsVisible) {
@@ -160,6 +161,7 @@ void csRender(Object* obj) {
     }
 
     glMultMatrixf(obj->transform);
+    glEnable(GL_LIGHTING);
     objRenderChild(obj);
 
     glPopMatrix();

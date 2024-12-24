@@ -19,53 +19,61 @@ BotArm* newBotArm() {
 }
 
 void barmRender(Component* obj) {
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glMultMatrixf(obj->transform);
-	
-	glBegin(GL_QUADS);
-	{
-		glColor3f(.5f, .5f, .5f);
-		
-		// top
-		glVertex3f(.2f, .0f, .2f);
-		glVertex3f(-.2f, .0f, .2f);
-		glVertex3f(-.2f, .0f, -.2f);
-		glVertex3f(.2f, .0f, -.2f);
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glMultMatrixf(obj->transform);
 
-		// bottom
-		glVertex3f(.2f, -.8f, .2f);
-		glVertex3f(.2f, -.8f, -.2f);
-		glVertex3f(-.2f, -.8f, -.2f);
-		glVertex3f(-.2f, -.8f, .2f);
+    glBegin(GL_QUADS);
+    {
+        glColor3f(0.5f, 0.5f, 0.5f);
 
-		// front
-		glVertex3f(.2f, .0f, .2f);
-		glVertex3f(.2f, -.8f, .2f);
-		glVertex3f(-.2f, -.8f, .2f);
-		glVertex3f(-.2f, .0f, .2f);
+        // Top face (normal: (0, 1, 0))
+        glNormal3f(0.0f, 1.0f, 0.0f);
+        glVertex3f(0.2f, 0.0f, 0.2f);
+        glVertex3f(-0.2f, 0.0f, 0.2f);
+        glVertex3f(-0.2f, 0.0f, -0.2f);
+        glVertex3f(0.2f, 0.0f, -0.2f);
 
-		// back
-		glVertex3f(.2f, .0f, -.2f);
-		glVertex3f(-.2f, .0f, -.2f);
-		glVertex3f(-.2f, -.8f, -.2f);
-		glVertex3f(.2f, -.8f, -.2f);
+        // Bottom face (normal: (0, -1, 0))
+        glNormal3f(0.0f, -1.0f, 0.0f);
+        glVertex3f(0.2f, -0.8f, 0.2f);
+        glVertex3f(0.2f, -0.8f, -0.2f);
+        glVertex3f(-0.2f, -0.8f, -0.2f);
+        glVertex3f(-0.2f, -0.8f, 0.2f);
 
-		// left
-		glVertex3f(-.2f, .0f, .2f);
-		glVertex3f(-.2f, -.8f, .2f);
-		glVertex3f(-.2f, -.8f, -.2f);
-		glVertex3f(-.2f, .0f, -.2f);
+        // Front face (normal: (0, 0, 1))
+        glNormal3f(0.0f, 0.0f, 1.0f);
+        glVertex3f(0.2f, 0.0f, 0.2f);
+        glVertex3f(0.2f, -0.8f, 0.2f);
+        glVertex3f(-0.2f, -0.8f, 0.2f);
+        glVertex3f(-0.2f, 0.0f, 0.2f);
 
-		// right
-		glVertex3f(.2f, .0f, .2f);
-		glVertex3f(.2f, .0f, -.2f);
-		glVertex3f(.2f, -.8f, -.2f);
-		glVertex3f(.2f, -.8f, .2f);
-	}
-	glEnd();
+        // Back face (normal: (0, 0, -1))
+        glNormal3f(0.0f, 0.0f, -1.0f);
+        glVertex3f(0.2f, 0.0f, -0.2f);
+        glVertex3f(-0.2f, 0.0f, -0.2f);
+        glVertex3f(-0.2f, -0.8f, -0.2f);
+        glVertex3f(0.2f, -0.8f, -0.2f);
 
-	compRenderChild(obj);
+        // Left face (normal: (-1, 0, 0))
+        glNormal3f(-1.0f, 0.0f, 0.0f);
+        glVertex3f(-0.2f, 0.0f, 0.2f);
+        glVertex3f(-0.2f, -0.8f, 0.2f);
+        glVertex3f(-0.2f, -0.8f, -0.2f);
+        glVertex3f(-0.2f, 0.0f, -0.2f);
 
-	glPopMatrix();
+        // Right face (normal: (1, 0, 0))
+        glNormal3f(1.0f, 0.0f, 0.0f);
+        glVertex3f(0.2f, 0.0f, 0.2f);
+        glVertex3f(0.2f, 0.0f, -0.2f);
+        glVertex3f(0.2f, -0.8f, -0.2f);
+        glVertex3f(0.2f, -0.8f, 0.2f);
+    }
+    glEnd();
+
+    // Render child components
+    compRenderChild(obj);
+
+    glPopMatrix();
 }
+

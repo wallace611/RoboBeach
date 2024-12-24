@@ -15,6 +15,8 @@
 #include "object/Rock.h"
 #include "object/Umbrella.h"
 #include "object/Fan.h"
+#include "object/Light.h"
+#include "object/Flashlight.h"
 
 int generate_checkcode(void* pt) {
 	if (pt == NULL) return -1;
@@ -114,6 +116,18 @@ void* obj_casting(void* pt, obj_type_t type) {
 
 	case FAN:
 		if (((Fan*)up)->obj_type == FAN) {
+			return up;
+		}
+		break;
+
+	case LIGHT:
+		if (((Light*) up)->obj_type == LIGHT) {
+			return up;
+		}
+		break;
+
+	case FLASH:
+		if (((Flashlight*) up)->obj_type == FLASH) {
 			return up;
 		}
 		break;

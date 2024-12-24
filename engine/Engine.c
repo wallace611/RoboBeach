@@ -58,12 +58,20 @@ void engineInit(int* argc, char** argv) {
 
 void engineRenderInit() {
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-
 	glClearDepth(1.0f);
 
 	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
 
-	glDepthFunc(GL_LEQUAL);
+	//glDisable(GL_BLEND);
+
+	glEnable(GL_LIGHTING);
+	glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
+
+	glShadeModel(GL_SMOOTH);
+
+	glEnable(GL_NORMALIZE);
+
 }
 
 void engineStartLoop() {

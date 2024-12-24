@@ -7,6 +7,7 @@
 #include "object/Rock.h"
 #include "object/Umbrella.h"
 #include "object/Fan.h"
+#include "object/Light.h"
 
 struct _scene {
 	Floor* sand;
@@ -18,6 +19,8 @@ struct _scene {
 	Umbrella* umb4;
 	Umbrella* umb5;
 	Umbrella* umb6;
+	Light* light1;
+	Light* sun;
 	Fan* fan1;
 	Object* axis;
 	Object* viewVolume;
@@ -51,3 +54,4 @@ void rbSwitchView();
 
 void axisRender(Object* obj);
 void fpsCamUpdate(Object* obj, float deltatime);
+void sunUpdate(Object* obj, float deltatime);

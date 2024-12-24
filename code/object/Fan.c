@@ -61,6 +61,9 @@ void fanUpdate(Object* obj, float deltatime) {
 
 void draw_blade() {
 	glBegin(GL_POLYGON);
+	// All points lie in z=0 plane, so normal is +Z
+	glNormal3f(0.0f, 0.0f, 1.0f);
+
 	glVertex3f(0.0, 0.0, 0.0);
 	glVertex3f(1.0, 4.0, 0.0);
 	glVertex3f(1.0, 8.0, 0.0);
@@ -69,31 +72,59 @@ void draw_blade() {
 	glEnd();
 }
 
-void draw_cube() {
-	int    i;
-	float  points[][3] = {{-0.5, -0.5, -0.5}, {0.5, -0.5, -0.5}, 
-		{0.5, 0.5, -0.5}, {-0.5, 0.5, -0.5}, 
-		{-0.5, -0.5, 0.5}, {0.5, -0.5, 0.5},
-		{0.5, 0.5, 0.5}, {-0.5, 0.5, 0.5}};
-	int    face[][4] = {{0, 3, 2, 1}, {0, 1, 5, 4}, {1, 2, 6, 5}, 
-		{4, 5, 6, 7}, {2, 3, 7, 6}, {0, 4, 7, 3}};
 
-	glColor3f(0.20, 0.75, 0.0);  /* Set the current color */
-	for(i=0;i<6;i++){
-		glBegin(GL_POLYGON);  /* Draw the face */
-		glVertex3fv(points[face[i][0]]);
-		glVertex3fv(points[face[i][1]]);
-		glVertex3fv(points[face[i][2]]);
-		glVertex3fv(points[face[i][3]]);
+void draw_cube() {
+	// One normal per face, corresponding to the 'face' array order
+	static float normals[6][3] = {
+		{ 0.0f,  0.0f, -1.0f},   // face[0] -> z = -0.5
+		{ 0.0f, -1.0f,  0.0f},   // face[1] -> y = -0.5
+		{ 1.0f,  0.0f,  0.0f},   // face[2] -> x =  0.5
+		{ 0.0f,  0.0f,  1.0f},   // face[3] -> z =  0.5
+		{ 0.0f,  1.0f,  0.0f},   // face[4] -> y =  0.5
+		{-1.0f,  0.0f,  0.0f}    // face[5] -> x = -0.5
+	};
+
+	float  points[][3] = {
+		{-0.5f, -0.5f, -0.5f}, { 0.5f, -0.5f, -0.5f}, 
+		{ 0.5f,  0.5f, -0.5f}, {-0.5f,  0.5f, -0.5f}, 
+		{-0.5f, -0.5f,  0.5f}, { 0.5f, -0.5f,  0.5f},
+		{ 0.5f,  0.5f,  0.5f}, {-0.5f,  0.5f,  0.5f}
+	};
+
+	int face[][4] = {
+		{0, 3, 2, 1},  // face[0]
+		{0, 1, 5, 4},  // face[1]
+		{1, 2, 6, 5},  // face[2]
+		{4, 5, 6, 7},  // face[3]
+		{2, 3, 7, 6},  // face[4]
+		{0, 4, 7, 3}   // face[5]
+	};
+
+	glColor3f(0.20f, 0.75f, 0.0f);  /* Set the current color */
+
+	for(int i = 0; i < 6; i++){
+		glBegin(GL_POLYGON);
+
+		// Specify the face normal before the face’s vertices
+		glNormal3fv(normals[i]);
+
+		// Draw the four vertices of this face
+		glVertex3fv(points[ face[i][0] ]);
+		glVertex3fv(points[ face[i][1] ]);
+		glVertex3fv(points[ face[i][2] ]);
+		glVertex3fv(points[ face[i][3] ]);
+
 		glEnd();
 	}
 }
+
 
 GLUquadricObj  *sphere=NULL, *cylind=NULL;
 
 void fanRender(Object* obj) {
 	Fan* fan = cast(obj, FAN);
 	if (fan == NULL) return;
+
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 
@@ -102,72 +133,120 @@ void fanRender(Object* obj) {
 	glMultMatrixf(worldTrans);
 	glScalef(.1, .1, .1);
 
+	// 材質屬性變數
+	GLfloat materialAmbient[4], materialDiffuse[4], materialSpecular[4], materialShininess;
+
 	glPushMatrix();
 
-	glPushMatrix();              /* Save M1 coord. sys */
-	glScalef(6.0, 6.0, 6.0);     /* Scale up the axes by 6 times */
-	draw_cube();                 /* Draw a unit cube in the new coord. sys. */
-	glPopMatrix();               /* Get M1 back */
+	// 底部立方體
+	glPushMatrix();
+	glScalef(6.0, 6.0, 6.0);
 
-	glTranslatef(0.0, 3.0, 0.0); /* Go up by 2 units, move to M2 coord. sys */
+	materialAmbient[0] = 0.2f; materialAmbient[1] = 0.2f; materialAmbient[2] = 0.2f; materialAmbient[3] = 1.0f;
+	materialDiffuse[0] = 0.5f; materialDiffuse[1] = 0.5f; materialDiffuse[2] = 0.5f; materialDiffuse[3] = 1.0f;
+	materialSpecular[0] = 0.8f; materialSpecular[1] = 0.8f; materialSpecular[2] = 0.8f; materialSpecular[3] = 1.0f;
+	materialShininess = 50.0f;
 
-	/*-------Draw the cylinder, arm of the windmill------*/
-	glColor3f(0.68, 0.68, 0.68);    /* Gray colored */
+	glMaterialfv(GL_FRONT, GL_AMBIENT, materialAmbient);
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, materialDiffuse);
+	glMaterialfv(GL_FRONT, GL_SPECULAR, materialSpecular);
+	glMaterialf(GL_FRONT, GL_SHININESS, materialShininess);
 
-	if(cylind==NULL){               /* allocate a quadric object, if necessary */
+	draw_cube();
+	glPopMatrix();
+
+	// 中間支柱（圓柱）
+	glTranslatef(0.0, 3.0, 0.0);
+	materialAmbient[0] = 0.3f; materialAmbient[1] = 0.3f; materialAmbient[2] = 0.3f; materialAmbient[3] = 1.0f;
+	materialDiffuse[0] = 0.68f; materialDiffuse[1] = 0.68f; materialDiffuse[2] = 0.68f; materialDiffuse[3] = 1.0f;
+	materialSpecular[0] = 0.8f; materialSpecular[1] = 0.8f; materialSpecular[2] = 0.8f; materialSpecular[3] = 1.0f;
+	materialShininess = 30.0f;
+
+	glMaterialfv(GL_FRONT, GL_AMBIENT, materialAmbient);
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, materialDiffuse);
+	glMaterialfv(GL_FRONT, GL_SPECULAR, materialSpecular);
+	glMaterialf(GL_FRONT, GL_SHININESS, materialShininess);
+
+	if (cylind == NULL) {
 		cylind = gluNewQuadric();
 		gluQuadricDrawStyle(cylind, GLU_FILL);
 		gluQuadricNormals(cylind, GLU_SMOOTH);
 	}
 
-	glPushMatrix();              /* Save M2 system */
-	glRotatef(-90.0, 1.0, 0.0, 0.0);  /* Roate about x axis, z become y,
-	and y become -z */
-	/*--- Draw a cylinder ---*/
-	gluCylinder(cylind, 1.0, 1.0, /* radius of top and bottom circle */
-		7.0,              /* height of the cylinder */
-		12,               /* use 12-side polygon approximating circle*/
-		3);               /* Divide it into 3 sections */
-	glPopMatrix();         /* Get M2 back */
+	glPushMatrix();
+	glRotatef(-90.0, 1.0, 0.0, 0.0);
+	gluCylinder(cylind, 1.0, 1.0, 7.0, 12, 3);
+	glPopMatrix();
 
-	glTranslatef(0.0, 8.0, 0.0); /* Go up 8 units, become M3 coord. sys*/
+	// 頂部球體
+	glTranslatef(0.0, 8.0, 0.0);
+	materialAmbient[0] = 0.4f; materialAmbient[1] = 0.1f; materialAmbient[2] = 0.1f; materialAmbient[3] = 1.0f;
+	materialDiffuse[0] = 0.95f; materialDiffuse[1] = 0.2f; materialDiffuse[2] = 0.2f; materialDiffuse[3] = 1.0f;
+	materialSpecular[0] = 0.9f; materialSpecular[1] = 0.3f; materialSpecular[2] = 0.3f; materialSpecular[3] = 1.0f;
+	materialShininess = 70.0f;
 
-	/*----- Draw a unit sphere ---*/
-	if(sphere==NULL){
+	glMaterialfv(GL_FRONT, GL_AMBIENT, materialAmbient);
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, materialDiffuse);
+	glMaterialfv(GL_FRONT, GL_SPECULAR, materialSpecular);
+	glMaterialf(GL_FRONT, GL_SHININESS, materialShininess);
+
+	if (sphere == NULL) {
 		sphere = gluNewQuadric();
 		gluQuadricDrawStyle(sphere, GLU_FILL);
 	}
-	glColor3f(0.95, 0.2, 0.2);
-	gluSphere(sphere, 2.0,   /* radius=2.0 */
-		12,            /* composing of 12 slices*/
-		12);           /* composing of 12 stacks */
+	gluSphere(sphere, 2.0, 12, 12);
 
-	/*---- Draw forearm of the windmill ---*/
-	glRotatef(.0f, 0.0, 1.0, 0.0);
+	// 風扇臂（小圓柱）
+	materialAmbient[0] = 0.3f; materialAmbient[1] = 0.3f; materialAmbient[2] = 0.3f; materialAmbient[3] = 1.0f;
+	materialDiffuse[0] = 0.68f; materialDiffuse[1] = 0.68f; materialDiffuse[2] = 0.68f; materialDiffuse[3] = 1.0f;
+	materialSpecular[0] = 0.8f; materialSpecular[1] = 0.8f; materialSpecular[2] = 0.8f; materialSpecular[3] = 1.0f;
+	materialShininess = 30.0f;
 
-	glColor3f(0.68, 0.68, 0.68);
+	glMaterialfv(GL_FRONT, GL_AMBIENT, materialAmbient);
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, materialDiffuse);
+	glMaterialfv(GL_FRONT, GL_SPECULAR, materialSpecular);
+	glMaterialf(GL_FRONT, GL_SHININESS, materialShininess);
+
 	gluCylinder(cylind, 1.0, 1.0, 4.0, 12, 3);
+	glTranslatef(0.0, 0.0, 5.0);
 
-	glTranslatef(0.0, 0.0, 5.0); /* goto end of forearm, M4 coord. sys. */
-	glColor3f(0.2, 0.2, 0.95);
-	gluSphere(sphere, 1.5,   /* radius=1.5 */
-		12,            /* composing of 12 slices*/
-		12);           /* composing of 12 stacks */
+	// 小球（風扇連接處）
+	materialAmbient[0] = 0.2f; materialAmbient[1] = 0.2f; materialAmbient[2] = 0.8f; materialAmbient[3] = 1.0f;
+	materialDiffuse[0] = 0.2f; materialDiffuse[1] = 0.2f; materialDiffuse[2] = 0.95f; materialDiffuse[3] = 1.0f;
+	materialSpecular[0] = 0.5f; materialSpecular[1] = 0.5f; materialSpecular[2] = 1.0f; materialSpecular[3] = 1.0f;
+	materialShininess = 60.0f;
 
-	/*------Draw three blades ---*/
-	glColor3f(1.0, 1.0, 1.0);
+	glMaterialfv(GL_FRONT, GL_AMBIENT, materialAmbient);
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, materialDiffuse);
+	glMaterialfv(GL_FRONT, GL_SPECULAR, materialSpecular);
+	glMaterialf(GL_FRONT, GL_SHININESS, materialShininess);
 
-	glRotatef(fan->angle, 0.0, 0.0, 1.0);  /* Rotate about x axis, M5 coord. sys. */
-	draw_blade();/* draw the first blade */
+	gluSphere(sphere, 1.5, 12, 12);
 
-	glRotatef(120.0, 0.0, 0.0, 1.0);    /* rotate by 120 degree, M6 coord. sys */
-	draw_blade();/* draw 2nd blade */
+	// 風扇葉片
+	materialAmbient[0] = 0.2f; materialAmbient[1] = 0.2f; materialAmbient[2] = 0.2f; materialAmbient[3] = 1.0f;
+	materialDiffuse[0] = 1.0f; materialDiffuse[1] = 1.0f; materialDiffuse[2] = 1.0f; materialDiffuse[3] = 1.0f;
+	materialSpecular[0] = 0.9f; materialSpecular[1] = 0.9f; materialSpecular[2] = 0.9f; materialSpecular[3] = 1.0f;
+	materialShininess = 90.0f;
 
-	glRotatef(120.0, 0.0, 0.0, 1.0);    /* rotate by 120 degree,M7 coord. sys */
-	draw_blade();/* draw 3rd blade */
+	glMaterialfv(GL_FRONT, GL_AMBIENT, materialAmbient);
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, materialDiffuse);
+	glMaterialfv(GL_FRONT, GL_SPECULAR, materialSpecular);
+	glMaterialf(GL_FRONT, GL_SHININESS, materialShininess);
+
+	glRotatef(fan->angle, 0.0, 0.0, 1.0);
+	draw_blade();
+
+	glRotatef(120.0, 0.0, 0.0, 1.0);
+	draw_blade();
+
+	glRotatef(120.0, 0.0, 0.0, 1.0);
+	draw_blade();
+
 	glPopMatrix();
 	glPopMatrix();
 }
+
 
 void fanTouchFloor(Object* self, CollisionShape* selfcs, Object* other, CollisionShape* othercs) {
 	if (other == NULL || othercs == NULL || self == other || self->owner != NULL) return;

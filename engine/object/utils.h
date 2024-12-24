@@ -14,6 +14,8 @@ typedef int comp_type_t;
 #define ROCK	  7
 #define UMBRELLA  8
 #define FAN		  9
+#define LIGHT	 10
+#define FLASH	 11
 
 // Registered component type > 1024
 #define COMPONENT 1025

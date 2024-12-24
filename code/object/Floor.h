@@ -10,6 +10,8 @@ struct _floor {
 
 	CollisionShape* csCollide;
 
+	int type;
+
 	float color[3];
 
 	Object* obj;
