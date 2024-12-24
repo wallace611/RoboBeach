@@ -100,6 +100,7 @@ void setupObjects() {
 	Scene.sun->specular[2] = 1.0f;
 	Scene.sun->specular[3] = 1.0f;
 	Scene.sun->obj->update = sunUpdate;
+	Scene.sunOrbit = 1;
 
 	Scene.flashLight = newFlashlight(GL_LIGHT2);
 	check(Scene.flashLight);
@@ -161,9 +162,24 @@ void setupInputMapping() {
 	imMapFloat1Key('i', KEY_HOLD, rbZoom, 1);
 	imMapFloat1Key('o', KEY_HOLD, rbZoom, -1);
 	imMapActionKey('b', KEY_PRESS, rbSwitchView);
-	imMapActionKey('1', KEY_PRESS, toggleSun);
-	imMapActionKey('2', KEY_PRESS, togglePoint);
-	imMapActionKey('3', KEY_PRESS, toggleSpot);
+	imMapFloat1Key('1', KEY_PRESS, toggleLight, 1.0f);
+	imMapFloat1Key('2', KEY_PRESS, toggleLight, 2.0f);
+	imMapFloat1Key('3', KEY_PRESS, toggleLight, 3.0f);
+	imMapFloat1Key('!', KEY_PRESS, selectLight, 1.0f); // switch to dir
+	imMapFloat1Key('@', KEY_PRESS, selectLight, 2.0f); // switch to point
+	imMapFloat1Key('#', KEY_PRESS, selectLight, 3.0f); // switch to spot
+	imMapFloat1Key('m', KEY_HOLD, changeColor, 0.0f); // intensity
+	imMapFloat1Key(',', KEY_HOLD, changeColor, 1.0f); // red
+	imMapFloat1Key('.', KEY_HOLD, changeColor, 2.0f); // green
+	imMapFloat1Key('/', KEY_HOLD, changeColor, 3.0f); // blue
+	imMapFloat1Key('k', KEY_HOLD, changeAttribute, 1.0f); // add cutoff, add dir x
+	imMapFloat1Key('K', KEY_HOLD, changeAttribute, -1.0f); // reduce cutoff, minus dir x
+	imMapFloat1Key('l', KEY_HOLD, changeAttribute, 2.0f); // add dir y
+	imMapFloat1Key('L', KEY_HOLD, changeAttribute, -2.0f); // minus dir y
+	imMapFloat1Key(';', KEY_HOLD, changeAttribute, 3.0f); // add dir z
+	imMapFloat1Key(':', KEY_HOLD, changeAttribute, -3.0f); // minus dir z
+	imMapFloat1Key('p', KEY_PRESS, changeAttribute, 4.0f); // toggle orbiting
+
 }
 
 void rbMove(float forward, float side) {
@@ -312,6 +328,7 @@ void fpsCamUpdate(Object* obj, float deltatime) {
 }
 
 void sunUpdate(Object* obj, float deltatime) {
+	if (!Scene.sunOrbit) return;
 	static float angle = 0.0f; 
 	angle += deltatime; 
 
@@ -324,14 +341,75 @@ void sunUpdate(Object* obj, float deltatime) {
 	obj->transform[3][2] = z;
 }
 
-void toggleSun() {
-	Scene.sun->isOn = !Scene.sun->isOn;
+void toggleLight(float val) {
+	int f = val;
+	if (f == 1) Scene.sun->isOn = !Scene.sun->isOn;
+	else if (f == 2) Scene.light1->isOn = !Scene.light1->isOn;
+	else Scene.flashLight->isOn = !Scene.flashLight->isOn;
 }
 
-void togglePoint() {
-	Scene.light1->isOn = !Scene.light1->isOn;
+int selectedLight = 1;
+
+void selectLight(float val) {
+	selectedLight = (int) val;
 }
 
-void toggleSpot() {
-	Scene.flashLight->isOn = !Scene.flashLight->isOn;
+void changeColor(float val) {
+	int f = val;
+
+	Light* target;
+	switch (selectedLight) {
+	case 1:
+		target = Scene.sun;
+		break;
+
+	case 2:
+		target = Scene.light1;
+		break;
+
+	default:
+		target = Scene.flashLight->light;
+		break;
+	}
+
+	if (f == 0) {
+		target->diffuse[0] = fmodf(target->diffuse[0] + .01f, 1.0f);
+		target->diffuse[1] = fmodf(target->diffuse[1] + .01f, 1.0f);
+		target->diffuse[2] = fmodf(target->diffuse[2] + .01f, 1.0f);
+	}
+	else if (f == 1) {
+		target->diffuse[0] = fmodf(target->diffuse[0] + .01f, 1.0f);
+	}
+	else if (f == 2) {
+		target->diffuse[1] = fmodf(target->diffuse[1] + .01f, 1.0f);
+	}
+	else {
+		target->diffuse[2] = fmodf(target->diffuse[2] + .01f, 1.0f);
+	}
+}
+
+void changeAttribute(float val) {
+	int f = abs(val);
+	if (selectedLight == 1) {
+		switch (f) {
+		case 1:
+			Scene.sun->obj->transform[3][0] += val > 0 ? .1f : -.1f;
+			break;
+
+		case 2:
+			Scene.sun->obj->transform[3][1] += val > 0 ? .1f : -.1f;
+			break;
+
+		case 3:
+			Scene.sun->obj->transform[3][2] += val > 0 ? .1f : -.1f;
+			break;
+
+		case 4:
+			Scene.sunOrbit = !Scene.sunOrbit;
+			break;
+		}
+	}
+	else if (selectedLight == 3 && f == 1) {
+		Scene.flashLight->cutoffAngle += val;
+	}
 }

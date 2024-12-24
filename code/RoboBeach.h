@@ -22,6 +22,7 @@ struct _scene {
 	Umbrella* umb6;
 	Light* light1;
 	Light* sun;
+	unsigned char sunOrbit;
 	Flashlight* flashLight;
 	Fan* fan1;
 	Object* axis;
@@ -58,6 +59,8 @@ void axisRender(Object* obj);
 void fpsCamUpdate(Object* obj, float deltatime);
 void sunUpdate(Object* obj, float deltatime);
 
-void toggleSun();
-void togglePoint();
-void toggleSpot();
+void toggleLight(float val);
+void selectLight(float val);
+
+void changeColor(float val);
+void changeAttribute(float val);

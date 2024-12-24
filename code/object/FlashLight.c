@@ -10,6 +10,7 @@ Flashlight* newFlashlight(int numb) {
 	flash->obj_type = FLASH;
 	flash->obj = inheriteObj(flash, FLASH);
     flash->isOn = 1;
+    flash->cutoffAngle = 30.0f;
 	if (flash->obj == NULL) return NULL;
 
 	Light* light = flash->light = newLight(numb);
@@ -56,11 +57,11 @@ void flashLightRender(Object* obj) {
         glLightfv(light->light_numb, GL_POSITION, lightPosition);
 
         // 設置聚光燈方向
-        GLfloat spotDirection[] = { 0.0f, .0f, 1.0f }; // 聚光燈指向 -Y 軸（可以根據需要調整）
+        GLfloat spotDirection[] = { 0.0f, .0f, 1.0f };
         glLightfv(light->light_numb, GL_SPOT_DIRECTION, spotDirection);
 
         // 設置聚光角度
-        glLightf(light->light_numb, GL_SPOT_CUTOFF, 30.0f); // 30 度的光束角度
+        glLightf(light->light_numb, GL_SPOT_CUTOFF, ((Flashlight* )cast(light->obj->owner, FLASH))->cutoffAngle); // 30 度的光束角度
 
         // 設置聚光集中度
         glLightf(light->light_numb, GL_SPOT_EXPONENT, 10.0f); // 聚光集中度，越大光束越集中

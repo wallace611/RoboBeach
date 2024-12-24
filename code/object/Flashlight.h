@@ -10,6 +10,7 @@ struct _flash {
 	obj_type_t obj_type;
 
 	Light* light;
+	float cutoffAngle;
 	unsigned char isOn;
 	Object* obj;
 };
