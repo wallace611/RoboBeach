@@ -67,19 +67,28 @@ void floorRender(Object* obj) {
     glMaterialfv(GL_FRONT, GL_SPECULAR, specular);
     glMaterialf(GL_FRONT, GL_SHININESS, shininess);
 
-    // 開始繪製平面
-    glBegin(GL_POLYGON);
-    {
-        // 定義平面的法線
-        glNormal3f(0.0f, 1.0f, 0.0f);
+    // 繪製 10×10 的網格
+    int gridSize = 30;  // 網格的大小
+    float cellSize = 1.0f / gridSize; // 每個小平面的邊長
 
-        // 定義平面四個角的頂點
-        glVertex3f( 0.5f, 0.5f,  0.5f);
-        glVertex3f( 0.5f, 0.5f, -0.5f);
-        glVertex3f(-0.5f, 0.5f, -0.5f);
-        glVertex3f(-0.5f, 0.5f,  0.5f);
+    for (int i = 0; i < gridSize; ++i) {
+        for (int j = 0; j < gridSize; ++j) {
+            // 計算每個小平面的四個頂點
+            float x0 = -0.5f + i * cellSize;
+            float x1 = x0 + cellSize;
+            float z0 = -0.5f + j * cellSize;
+            float z1 = z0 + cellSize;
+
+            glBegin(GL_QUADS); // 繪製每個小平面
+            glNormal3f(0.0f, 1.0f, 0.0f); // 法線指向 +Y
+            glVertex3f(x0, 0.5f, z0); // 左下
+            glVertex3f(x1, 0.5f, z0); // 右下
+            glVertex3f(x1, 0.5f, z1); // 右上
+            glVertex3f(x0, 0.5f, z1); // 左上
+            glEnd();
+        }
     }
-    glEnd();
 
     glPopMatrix();
 }
+

@@ -13,6 +13,9 @@ struct _light {
 	float specular[4];
 	float ambient[4];
 
+	unsigned char isOn;
+	unsigned char isRenderSphere;
+
 	Object* obj;
 };
 

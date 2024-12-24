@@ -20,6 +20,9 @@ Light* newLight(int numb) {
 		light->specular[i] = specular[i];
 	}
 
+    light->isRenderSphere = 1;
+    light->isOn = 1;
+
 	light->obj->render = lightRender;
 
 	return light;
@@ -28,21 +31,52 @@ Light* newLight(int numb) {
 void lightRender(Object* obj) {
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
-    glMultMatrixf(obj->transform);
+    mat4 worldTrans;
+    objGetWorldTransform(worldTrans, obj);
+    glMultMatrixf(worldTrans);
 
     Light* light = cast(obj, LIGHT);
     if (light != NULL) {
-        glEnable(light->light_numb);
+        if (light->isOn) glEnable(light->light_numb);
+        else glDisable(light->light_numb);
+
 
         if (light->type == 1) {
             // 設置光源位置為 (0, 0, 0) (方向光)
             glLightfv(light->light_numb, GL_POSITION, (GLfloat[]) { .0f, .0f, .0f, light->type });
 
-            // 畫出光源的 wired sphere 作為可視化
-            glDisable(GL_LIGHTING);  // 暫時禁用光照，以便繪製球體
-            glColor3f(1.0f, 1.0f, 0.0f);  // 設置顏色為黃色
-            glutWireSphere(0.1, 10, 10);  // 繪製一個半徑為 0.1 的 wired sphere
-            glEnable(GL_LIGHTING);   // 啟用光照
+            // 設置衰減參數
+            glLightf(light->light_numb, GL_CONSTANT_ATTENUATION, 1.0f); // 常量衰減
+            glLightf(light->light_numb, GL_LINEAR_ATTENUATION, 0.1f);   // 線性衰減
+            glLightf(light->light_numb, GL_QUADRATIC_ATTENUATION, 0.01f); // 二次衰減
+
+            if (light->isRenderSphere) {
+                glPushMatrix();
+                glScalef(.1f, .1f, .1f);
+
+                // 設置材質屬性
+                GLfloat ambient[] = { 0.1f, 0.1f, 0.1f, 1.0f };  // 環境光
+                GLfloat diffuse[] = { 0.6f, 0.2f, 0.2f, 1.0f };  // 漫射光
+                GLfloat specular[] = { 0.8f, 0.8f, 0.8f, 1.0f }; // 高光
+                GLfloat shininess = 50.0f;                       // 光澤度
+                GLfloat emission[] = { .6f, .6f, .0f, 1.0f }; // 自發光顏色 (金黃色)
+
+                // 應用材質
+                /*glMaterialfv(GL_FRONT, GL_AMBIENT, ambient);
+                glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
+                glMaterialfv(GL_FRONT, GL_SPECULAR, specular);
+                glMaterialf(GL_FRONT, GL_SHININESS, shininess);*/
+                glMaterialfv(GL_FRONT, GL_EMISSION, emission);
+
+                // 繪製球體
+                glutSolidSphere(1.0, 32, 32);
+
+                // 重置發光效果，避免影響其他物體
+                GLfloat noEmission[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+                glMaterialfv(GL_FRONT, GL_EMISSION, noEmission);
+
+                glPopMatrix();
+            }
         } else {
             // 設置光源位置為物體的世界位置 (點光源)
             glLightfv(light->light_numb, GL_POSITION, (GLfloat[]) {
@@ -63,4 +97,5 @@ void lightRender(Object* obj) {
 
     glPopMatrix();
 }
+
 

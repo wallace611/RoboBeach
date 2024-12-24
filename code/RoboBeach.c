@@ -101,6 +101,11 @@ void setupObjects() {
 	Scene.sun->specular[3] = 1.0f;
 	Scene.sun->obj->update = sunUpdate;
 
+	Scene.flashLight = newFlashlight(GL_LIGHT2);
+	check(Scene.flashLight);
+	worldSpawnObj(world, Scene.flashLight->obj);
+	glm_translate(Scene.flashLight->obj->transform, (vec3) { .0f, .0f, -10.0f });
+
 	Scene.fan1 = newFan();
 	check(Scene.fan1);
 	worldSpawnObj(world, Scene.fan1->obj);
@@ -156,7 +161,9 @@ void setupInputMapping() {
 	imMapFloat1Key('i', KEY_HOLD, rbZoom, 1);
 	imMapFloat1Key('o', KEY_HOLD, rbZoom, -1);
 	imMapActionKey('b', KEY_PRESS, rbSwitchView);
-
+	imMapActionKey('1', KEY_PRESS, toggleSun);
+	imMapActionKey('2', KEY_PRESS, togglePoint);
+	imMapActionKey('3', KEY_PRESS, toggleSpot);
 }
 
 void rbMove(float forward, float side) {
@@ -315,4 +322,16 @@ void sunUpdate(Object* obj, float deltatime) {
 	obj->transform[3][0] = x;
 	obj->transform[3][1] = y;
 	obj->transform[3][2] = z;
+}
+
+void toggleSun() {
+	Scene.sun->isOn = !Scene.sun->isOn;
+}
+
+void togglePoint() {
+	Scene.light1->isOn = !Scene.light1->isOn;
+}
+
+void toggleSpot() {
+	Scene.flashLight->isOn = !Scene.flashLight->isOn;
 }
