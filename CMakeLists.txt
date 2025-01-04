@@ -41,6 +41,7 @@ message(STATUS "C Release Flags: ${CMAKE_C_FLAGS_RELEASE}")
 find_package(OpenGL REQUIRED)
 find_package(GLUT REQUIRED)
 find_package(cglm REQUIRED)
+find_package(Stb REQUIRED)
 
 include_directories(${CMAKE_SOURCE_DIR}/engine)
 include_directories(${CMAKE_SOURCE_DIR}/code)
@@ -103,8 +104,9 @@ foreach(ex IN LISTS Examples)
         "code/RoboBeach.c"
         "code/RoboBeach.h" 
         "code/Test.h"
-     "code/object/Umbrella.h" "code/object/Umbrella.c" "code/object/Fan.h" "code/object/Fan.c"   "engine/object/Light.h" "engine/object/Light.c" "code/object/Flashlight.h" "code/object/FlashLight.c")
+     "code/object/Umbrella.h" "code/object/Umbrella.c" "code/object/Fan.h" "code/object/Fan.c"   "engine/object/Light.h" "engine/object/Light.c" "code/object/Flashlight.h" "code/object/FlashLight.c" "engine/texture/Texture.h" "engine/texture/Texture.c" "engine/object/Billboard.h" "engine/object/Billboard.c")
     target_link_libraries(${ex} PRIVATE GLUT::GLUT)
+    target_include_directories(${ex} PRIVATE ${Stb_INCLUDE_DIR})
 
     if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
         target_link_libraries(${ex} PRIVATE
@@ -118,4 +120,6 @@ foreach(ex IN LISTS Examples)
             OpenGL32
         )
     endif()
+
+    file(COPY "${CMAKE_SOURCE_DIR}/Pictures" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
 endforeach()

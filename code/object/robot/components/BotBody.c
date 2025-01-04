@@ -1,5 +1,7 @@
 #include "BotBody.h"
 
+#include "texture/Texture.h"
+
 BotBody* newBotBody() {
 	BotBody* bbody = (BotBody*)malloc(sizeof(BotBody));
 	if (bbody == NULL) return NULL;
@@ -27,7 +29,14 @@ void bbodyRender(Component* obj) {
 	glPushMatrix();
 	glMultMatrixf(obj->transform);
 
-	// 設置金屬材質屬性
+	// 啟用紋理並綁定編號 textureName[4]
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, textureName[4]);
+
+	// 可調整的 scale，用於控制紋理平鋪密集度
+	float scale = .5f; // scale 越大，紋理平鋪越密集
+
+	// 設置金屬材質屬性（可選）
 	GLfloat materialAmbient[] = { 0.25f, 0.25f, 0.25f, 1.0f };
 	GLfloat materialDiffuse[] = { 0.2f, 0.2f, 0.2f, 1.0f };
 	GLfloat materialSpecular[] = { 0.50f, 0.77f, 0.77f, 1.0f };
@@ -45,66 +54,45 @@ void bbodyRender(Component* obj) {
 	{
 		// Bottom face (normal: (0, -1, 0))
 		glNormal3f(0.0f, -1.0f, 0.0f);
-		//glColor3f(.5f, .5f, .5f);
-		glVertex3f(0.5f, -0.5f, 0.5f);
-		glVertex3f(-0.5f, -0.5f, 0.5f);
-		glVertex3f(-0.5f, -0.5f, -0.5f);
-		glVertex3f(0.5f, -0.5f, -0.5f);
+		glTexCoord2f(scale, 0.0f); glVertex3f(0.5f, -0.5f, 0.5f);
+		glTexCoord2f(0.0f, 0.0f); glVertex3f(-0.5f, -0.5f, 0.5f);
+		glTexCoord2f(0.0f, scale); glVertex3f(-0.5f, -0.5f, -0.5f);
+		glTexCoord2f(scale, scale); glVertex3f(0.5f, -0.5f, -0.5f);
 
 		// Top face (normal: (0, 1, 0))
 		glNormal3f(0.0f, 1.0f, 0.0f);
-		//glColor3f(.65f, .65f, .65f);
-		glVertex3f(0.5f, 0.5f, 0.5f);
-		glVertex3f(0.5f, 0.5f, -0.5f);
-
-		//glColor3f(.7f, .7f, .7f);
-		glVertex3f(-0.5f, 0.5f, -0.5f);
-		glVertex3f(-0.5f, 0.5f, 0.5f);
+		glTexCoord2f(scale, 0.0f); glVertex3f(0.5f, 0.5f, 0.5f);
+		glTexCoord2f(scale, scale); glVertex3f(0.5f, 0.5f, -0.5f);
+		glTexCoord2f(0.0f, scale); glVertex3f(-0.5f, 0.5f, -0.5f);
+		glTexCoord2f(0.0f, 0.0f); glVertex3f(-0.5f, 0.5f, 0.5f);
 
 		// Front face (normal: (0, 0, 1))
 		glNormal3f(0.0f, 0.0f, 1.0f);
-		//glColor3f(.65f, .65f, .65f);
-		glVertex3f(0.5f, 0.5f, 0.5f);
-
-		//glColor3f(.7f, .7f, .7f);
-		glVertex3f(-0.5f, 0.5f, 0.5f);
-
-		//glColor3f(.5f, .5f, .5f);
-		glVertex3f(-0.5f, -0.5f, 0.5f);
-		glVertex3f(0.5f, -0.5f, 0.5f);
+		glTexCoord2f(scale, 0.0f); glVertex3f(0.5f, 0.5f, 0.5f);
+		glTexCoord2f(0.0f, 0.0f); glVertex3f(-0.5f, 0.5f, 0.5f);
+		glTexCoord2f(0.0f, scale); glVertex3f(-0.5f, -0.5f, 0.5f);
+		glTexCoord2f(scale, scale); glVertex3f(0.5f, -0.5f, 0.5f);
 
 		// Back face (normal: (0, 0, -1))
 		glNormal3f(0.0f, 0.0f, -1.0f);
-		//glColor3f(.65f, .65f, .65f);
-		glVertex3f(0.5f, 0.5f, -0.5f);
-
-		//glColor3f(.5f, .5f, .5f);
-		glVertex3f(0.5f, -0.5f, -0.5f);
-		glVertex3f(-0.5f, -0.5f, -0.5f);
-
-		//glColor3f(.7f, .7f, .7f);
-		glVertex3f(-0.5f, 0.5f, -0.5f);
+		glTexCoord2f(scale, 0.0f); glVertex3f(0.5f, 0.5f, -0.5f);
+		glTexCoord2f(scale, scale); glVertex3f(0.5f, -0.5f, -0.5f);
+		glTexCoord2f(0.0f, scale); glVertex3f(-0.5f, -0.5f, -0.5f);
+		glTexCoord2f(0.0f, 0.0f); glVertex3f(-0.5f, 0.5f, -0.5f);
 
 		// Left face (normal: (1, 0, 0))
 		glNormal3f(1.0f, 0.0f, 0.0f);
-		//glColor3f(.65f, .65f, .65f);
-		glVertex3f(0.5f, 0.5f, 0.5f);
-
-		//glColor3f(.5f, .5f, .5f);
-		glVertex3f(0.5f, -0.5f, 0.5f);
-		glVertex3f(0.5f, -0.5f, -0.5f);
-
-		//glColor3f(.65f, .65f, .65f);
-		glVertex3f(0.5f, 0.5f, -0.5f);
+		glTexCoord2f(scale, 0.0f); glVertex3f(0.5f, 0.5f, 0.5f);
+		glTexCoord2f(scale, scale); glVertex3f(0.5f, -0.5f, 0.5f);
+		glTexCoord2f(0.0f, scale); glVertex3f(0.5f, -0.5f, -0.5f);
+		glTexCoord2f(0.0f, 0.0f); glVertex3f(0.5f, 0.5f, -0.5f);
 
 		// Right face (normal: (-1, 0, 0))
 		glNormal3f(-1.0f, 0.0f, 0.0f);
-		//glColor3f(.7f, .7f, .7f);
-		glVertex3f(-0.5f, 0.5f, 0.5f);
-		glVertex3f(-0.5f, 0.5f, -0.5f);
-		//glColor3f(.5f, .5f, .5f);
-		glVertex3f(-0.5f, -0.5f, -0.5f);
-		glVertex3f(-0.5f, -0.5f, 0.5f);
+		glTexCoord2f(scale, 0.0f); glVertex3f(-0.5f, 0.5f, 0.5f);
+		glTexCoord2f(scale, scale); glVertex3f(-0.5f, 0.5f, -0.5f);
+		glTexCoord2f(0.0f, scale); glVertex3f(-0.5f, -0.5f, -0.5f);
+		glTexCoord2f(0.0f, 0.0f); glVertex3f(-0.5f, -0.5f, 0.5f);
 	}
 	glEnd();
 	glPopMatrix();
@@ -116,8 +104,12 @@ void bbodyRender(Component* obj) {
 	glutSolidCylinder(0.07, 0.3, 10, 10);
 	glPopMatrix();
 
-	// Render child components
+	// 渲染子組件
 	compRenderChild(obj);
+
+	// 禁用紋理
+	glDisable(GL_TEXTURE_2D);
+
 	glPopMatrix();
 }
 

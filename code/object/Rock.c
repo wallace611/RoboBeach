@@ -1,5 +1,6 @@
 #include "Rock.h"
 
+#include "texture/Texture.h"
 #include "Engine.h"
 
 Rock* newRock() {
@@ -42,31 +43,44 @@ void rockUpdate(Object* obj, float deltatime) {
 }
 
 void rockRender(Object* obj) {
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
 
-	glMultMatrixf(obj->transform);
+    glMultMatrixf(obj->transform);
 
-	glPushMatrix();
+    glPushMatrix();
 
-	// 設置岩石材質
-	GLfloat rockAmbient[] = { 0.3f, 0.2f, 0.1f, 1.0f };  // 環境光 (暗棕色)
-	GLfloat rockDiffuse[] = { 0.5f, 0.35f, 0.2f, 1.0f }; // 漫射光 (中棕色)
-	GLfloat rockSpecular[] = { 0.1f, 0.1f, 0.1f, 1.0f }; // 高光反射 (微弱的光澤)
-	GLfloat rockShininess = 10.0f;                        // 光澤度 (低光澤)
+    // 啟用紋理並綁定編號 textureName[5]
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, textureName[5]);
 
-	glMaterialfv(GL_FRONT, GL_AMBIENT, rockAmbient);
-	glMaterialfv(GL_FRONT, GL_DIFFUSE, rockDiffuse);
-	glMaterialfv(GL_FRONT, GL_SPECULAR, rockSpecular);
-	glMaterialf(GL_FRONT, GL_SHININESS, rockShininess);
+    // 可調整的 scale，用於控制紋理平鋪密集度
+    float scale = 2.0f; // scale 越大，紋理平鋪越密集
 
-	// 繪製岩石 (球體)
-	glutSolidSphere(1.0f, 16, 16);
+    // 設置岩石材質屬性
+    GLfloat rockAmbient[] = { 0.3f, 0.2f, 0.1f, 1.0f };  // 環境光 (暗棕色)
+    GLfloat rockDiffuse[] = { 0.5f, 0.35f, 0.2f, 1.0f }; // 漫射光 (中棕色)
+    GLfloat rockSpecular[] = { 0.1f, 0.1f, 0.1f, 1.0f }; // 高光反射 (微弱的光澤)
+    GLfloat rockShininess = 10.0f;                        // 光澤度 (低光澤)
 
-	glPopMatrix();
+    glMaterialfv(GL_FRONT, GL_AMBIENT, rockAmbient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, rockDiffuse);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, rockSpecular);
+    glMaterialf(GL_FRONT, GL_SHININESS, rockShininess);
 
-	// 繪製子對象
-	objRenderChild(obj);
+    // 使用球體紋理坐標映射來繪製岩石
+    GLUquadric* quadric = gluNewQuadric();
+    gluQuadricTexture(quadric, GL_TRUE); // 啟用紋理映射
+    gluSphere(quadric, 1.0f, 16, 16);   // 繪製球體（岩石）
+    gluDeleteQuadric(quadric);
 
-	glPopMatrix();
+    glPopMatrix();
+
+    // 繪製子對象
+    objRenderChild(obj);
+
+    // 禁用紋理
+    glDisable(GL_TEXTURE_2D);
+
+    glPopMatrix();
 }

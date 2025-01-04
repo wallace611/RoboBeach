@@ -63,7 +63,10 @@ void engineRenderInit() {
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 
-	//glDisable(GL_BLEND);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_ALPHA_TEST);
+	glAlphaFunc(GL_GREATER, .5);
 
 	glEnable(GL_LIGHTING);
 	glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
@@ -163,9 +166,6 @@ void make_view(int x) {
 	case 3:   // Z方向平行視角
 		gluLookAt(0.0, 0.0, view_distance,  0.0, 0.0, 0.0,  0.0, 1.0, 0.0);
 		break;
-	case 4:   // 透視投影
-		//gluLookAt(view_distance * window_ratio, view_distance, view_distance,  Scene.bot->obj->transform[3][0], Scene.bot->obj->transform[3][1], Scene.bot->obj->transform[3][2], 0.0, 1.0, 0.0);
-		break;
 	}
 }
 
@@ -179,7 +179,7 @@ void make_projection(int x)
 
 	// Check if we are using perspective projection
 	if(x == 4) {
-		gluPerspective(world->cam->fov, (double)window_wid / (double)window_hei, 1.5, 50.0);
+		gluPerspective(world->cam->fov, (double)window_wid / (double)window_hei, world->cam->zNear, world->cam->zFar);
 	} else {
 		// Adjust orthographic projection based on camera FOV
 		float scale_factor = 60.0f / (fov); // Scaling factor, assuming 60 is a baseline FOV

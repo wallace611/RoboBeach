@@ -55,4 +55,5 @@ void camRender(Object* obj) {
 	mat4 ttmp;
 	glm_mat4_mul(cam->obj->transform, mirrorZ, ttmp);
 	glMultMatrixf(ttmp);
+
 }

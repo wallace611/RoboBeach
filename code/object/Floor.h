@@ -12,10 +12,13 @@ struct _floor {
 
 	int type;
 
+	float x, y;
+
 	float color[3];
 
 	Object* obj;
 };
 
 Floor* newFloor();
+void floorUpdate(Object* obj, float deltatime);
 void floorRender(Object* obj);

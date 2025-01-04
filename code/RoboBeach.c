@@ -2,6 +2,9 @@
 
 #include "Engine.h"
 #include "utils/Shapes.h"
+#include "texture/Texture.h"
+
+#include <stdlib.h>
 
 int runRoboBeach(int* argc, char** argv) {
 	engineInit(argc, argv);
@@ -9,6 +12,8 @@ int runRoboBeach(int* argc, char** argv) {
 	setupObjects();
 
 	setupInputMapping();
+
+	initTexture();
 
 	engineStartLoop();
 
@@ -115,7 +120,7 @@ void setupObjects() {
 	Scene.axis = newObject();
 	check(Scene.axis);
 	Scene.axis->render = axisRender;
-	worldSpawnObj(world, Scene.axis);
+	//worldSpawnObj(world, Scene.axis);
 	glm_scale(Scene.axis->transform, (vec3) { .3f, .3f, .3f });
 
 	Scene.bot = newRobot();
@@ -123,7 +128,29 @@ void setupObjects() {
 	worldSpawnObj(world, Scene.bot->obj);
 	glm_translate(Scene.bot->obj->transform, (vec3) { .0f, 2.0f, .0f });
 
+	for (int i = -25; i <= 25; i += 2) {
+		Scene.splashWater1 = newBillboard();
+		check(Scene.splashWater1);
+		worldSpawnObj(world, Scene.splashWater1->obj);
+		glm_translate(Scene.splashWater1->obj->transform, (vec3) { i, -3.0f, 10.0f });
+		Scene.splashWater1->texture = 7;
+		Scene.splashWater1->obj->update = splashWaterUpdate;
+		Scene.splashWater1->obj->render = splashWaterRender;
+		Scene.splashWater1->timer = ((float) i + 25) / 25;
+		Scene.splashWater1->y = ((float) i + 25) / 25;
+		Scene.splashWater1->scale = -((float) i + 25) / 25;
+	}
+
+	for (int i = 0; i < 10; i++) {
+		Billboard* tree = newBillboard();
+		check(tree);
+		worldSpawnObj(world, tree->obj);
+		glm_translate(tree->obj->transform, (vec3) { rand() % 50 - 25, .5f, -rand() % 25 });
+		tree->texture = 9;
+	}
+	
 	Scene.cameras[0] = Scene.bot->cam;
+	Scene.bot->cam->zFar = 10000.0f;
 	glm_vec3_copy((vec3) { 0.0f, 0.0f, 3.0f }, Scene.bot->cam->camPosition);
 	glm_vec3_copy((vec3) { 0.0f, 0.0f, -1.0f }, Scene.bot->cam->camFront);
 	glm_vec3_copy((vec3) { 0.0f, 1.0f, 0.0f }, Scene.bot->cam->camUp);
@@ -412,4 +439,32 @@ void changeAttribute(float val) {
 	else if (selectedLight == 3 && f == 1) {
 		Scene.flashLight->cutoffAngle += val;
 	}
+}
+
+void splashWaterUpdate(Object* obj, float deltatime) {
+	Billboard* bill = cast(obj, BILL);
+	if (bill == NULL) return;
+
+	if (bill->timer < 1.0f) {
+		bill->scale *= pow(2.0f, deltatime * 2);
+		bill->y += deltatime * 4;
+	}
+	if (bill->timer >= 1.0f && bill->timer < 3.0f) {
+		bill->scale /= pow(2.0f, deltatime);
+		bill->y -= deltatime * 2;
+	}
+
+	bill->timer += deltatime;
+	if (bill->timer >= 3.0f) {
+		bill->timer = 0.0f;
+		if (bill->texture == 7) bill->texture = 8;
+		else bill->texture = 7;
+	}
+}
+
+
+void splashWaterRender(Object* obj) {
+	glDisable(GL_LIGHTING);
+	billRender(obj);
+	glEnable(GL_LIGHTING);
 }

@@ -1,5 +1,6 @@
 #include "Umbrella.h"
 
+#include "texture/Texture.h"
 #include "Engine.h"
 
 Umbrella* newUmbrella() {
@@ -57,57 +58,76 @@ void umbUpdate(Object* obj, float deltatime) {
 }
 
 void umbRender(Object* obj) {
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
 
-	mat4 worldTrans;
-	objGetWorldTransform(worldTrans, obj);
-	glMultMatrixf(worldTrans);
+    mat4 worldTrans;
+    objGetWorldTransform(worldTrans, obj);
+    glMultMatrixf(worldTrans);
 
-	glPushMatrix();
-	{
-		// 雨傘柄
-		glTranslatef(.0f, -.5f, .0f);
-		glRotatef(90.0f, -1.0f, .0f, .0f);
+    glPushMatrix();
+    {
+        // 雨傘柄
+        glTranslatef(.0f, -.5f, .0f);
+        glRotatef(90.0f, -1.0f, .0f, .0f);
 
-		// 設置雨傘柄的材質屬性
-		GLfloat handleAmbient[] = { 0.3f, 0.3f, 0.3f, 1.0f };
-		GLfloat handleDiffuse[] = { 0.7f, 0.7f, 0.7f, 1.0f };
-		GLfloat handleSpecular[] = { 0.9f, 0.9f, 0.9f, 1.0f };
-		GLfloat handleShininess = 50.0f;
+        // 設置雨傘柄的材質屬性
+        GLfloat handleAmbient[] = { 0.3f, 0.3f, 0.3f, 1.0f };
+        GLfloat handleDiffuse[] = { 0.7f, 0.7f, 0.7f, 1.0f };
+        GLfloat handleSpecular[] = { 0.9f, 0.9f, 0.9f, 1.0f };
+        GLfloat handleShininess = 50.0f;
 
-		glMaterialfv(GL_FRONT, GL_AMBIENT, handleAmbient);
-		glMaterialfv(GL_FRONT, GL_DIFFUSE, handleDiffuse);
-		glMaterialfv(GL_FRONT, GL_SPECULAR, handleSpecular);
-		glMaterialf(GL_FRONT, GL_SHININESS, handleShininess);
+        glMaterialfv(GL_FRONT, GL_AMBIENT, handleAmbient);
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, handleDiffuse);
+        glMaterialfv(GL_FRONT, GL_SPECULAR, handleSpecular);
+        glMaterialf(GL_FRONT, GL_SHININESS, handleShininess);
 
-		// 繪製雨傘柄
-		glutSolidCylinder(.1, 4.0, 8, 8);
+        // 繪製雨傘柄
+        glutSolidCylinder(.1, 4.0, 8, 8);
 
-		// 移動到傘面位置
-		glTranslatef(.0f, .0f, 4.0f);
+        // 移動到傘面位置
+        glTranslatef(.0f, .0f, 4.0f);
 
-		// 設置雨傘面的材質屬性
-		GLfloat canopyAmbient[] = { 0.2f, 0.1f, 0.5f, 1.0f };
-		GLfloat canopyDiffuse[] = { 0.3f, 0.2f, 0.8f, 1.0f };
-		GLfloat canopySpecular[] = { 0.1f, 0.1f, 0.1f, 1.0f };
-		GLfloat canopyShininess = 3.0f;
+        // 啟用紋理並綁定編號 textureName[6]
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, textureName[6]);
 
-		glMaterialfv(GL_FRONT, GL_AMBIENT, canopyAmbient);
-		glMaterialfv(GL_FRONT, GL_DIFFUSE, canopyDiffuse);
-		glMaterialfv(GL_FRONT, GL_SPECULAR, canopySpecular);
-		glMaterialf(GL_FRONT, GL_SHININESS, canopyShininess);
+        // 設置可調整的 scale，用於控制紋理平鋪密集度
+        float scale = .5f; // scale 越大，紋理平鋪越密集
 
-		// 繪製雨傘面
-		glutSolidCylinder(3.0, .1, 16, 16);
-	}
-	glPopMatrix();
+        // 設置雨傘面的材質屬性
+        GLfloat canopyAmbient[] = { 0.2f, 0.1f, 0.5f, 1.0f };
+        GLfloat canopyDiffuse[] = { 0.3f, 0.2f, 0.8f, 1.0f };
+        GLfloat canopySpecular[] = { 0.1f, 0.1f, 0.1f, 1.0f };
+        GLfloat canopyShininess = 3.0f;
 
-	// 繪製子對象
-	objRenderChild(obj);
+        glMaterialfv(GL_FRONT, GL_AMBIENT, canopyAmbient);
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, canopyDiffuse);
+        glMaterialfv(GL_FRONT, GL_SPECULAR, canopySpecular);
+        glMaterialf(GL_FRONT, GL_SHININESS, canopyShininess);
 
-	glPopMatrix();
+        // 使用紋理繪製雨傘面
+        GLUquadric* quadric = gluNewQuadric();
+        gluQuadricTexture(quadric, GL_TRUE); // 啟用紋理映射
+        glMatrixMode(GL_TEXTURE);
+        glPushMatrix();
+        glScalef(scale, scale, 1.0f); // 調整紋理平鋪密集度
+        gluCylinder(quadric, 3.0, 0.0, 0.1, 16, 16);
+        glPopMatrix();
+        glMatrixMode(GL_MODELVIEW);
+        gluDeleteQuadric(quadric);
+
+        // 禁用紋理
+        glDisable(GL_TEXTURE_2D);
+    }
+    glPopMatrix();
+
+    // 繪製子對象
+    objRenderChild(obj);
+
+    glPopMatrix();
 }
+
 
 
 void botTouchFloor(Object* self, CollisionShape* selfcs, Object* other, CollisionShape* othercs) {

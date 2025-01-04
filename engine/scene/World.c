@@ -1,6 +1,7 @@
 #include "World.h"
 
 #include "utils/Shapes.h"
+#include "texture/Texture.h"
 #include "object/CollisionShape.h"
 
 World* newWorld() {
@@ -22,6 +23,35 @@ void worldUpdate(World* world, float deltatime) {
     }
 }
 
+void renderSkyDome() {
+    glPushMatrix();
+
+    // 禁用深度寫入，確保天空在背景
+    glDepthMask(GL_FALSE);
+
+    // 啟用紋理並綁定天空紋理
+    glEnable(GL_TEXTURE_2D);
+    glDisable(GL_LIGHTING);
+    glBindTexture(GL_TEXTURE_2D, textureName[10]);
+
+    // 繪製半球體作為天空
+    glRotatef(90.0f, 1.0f, .0f, .0f);
+    GLUquadric* quadric = gluNewQuadric();
+    gluQuadricTexture(quadric, GL_TRUE);
+    gluQuadricOrientation(quadric, GLU_INSIDE);
+    gluSphere(quadric, 500.0f, 64, 64);
+    gluDeleteQuadric(quadric);
+
+    glDisable(GL_TEXTURE_2D);
+    glEnable(GL_LIGHTING);
+    glDepthMask(GL_TRUE); // 恢復深度寫入
+
+    GLfloat skyAmbient[4] = { 0.2f, 0.3f, 0.5f, 1.0f }; // 假設天空為藍色
+    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, skyAmbient);
+
+    glPopMatrix();
+}
+
 void worldRender(World* world) {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -38,6 +68,7 @@ void worldRender(World* world) {
         Object* obj = ((CollisionShape*)world->collisionList->list[i])->obj;
         obj->render(obj);
     }
+    renderSkyDome();
     glPopMatrix();
 }
 

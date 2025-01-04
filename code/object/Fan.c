@@ -1,6 +1,7 @@
 #include "Fan.h"
 
 #include "Engine.h"
+#include "texture/Texture.h"
 
 Fan* newFan() {
 	Fan* fan = (Fan*)malloc(sizeof(Fan));
@@ -100,22 +101,33 @@ void draw_cube() {
 		{0, 4, 7, 3}   // face[5]
 	};
 
-	glColor3f(0.20f, 0.75f, 0.0f);  /* Set the current color */
 
-	for(int i = 0; i < 6; i++){
+	glEnable(GL_TEXTURE_2D);
+	glColor3f(0.20f, 0.75f, 0.0f);  /* Set the current color */
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glBindTexture(GL_TEXTURE_2D, textureName[2]);
+
+	float texCoords[4][2] = {
+		{0.0f, 0.0f}, // 左下
+		{1.0f, 0.0f}, // 右下
+		{1.0f, 1.0f}, // 右上
+		{0.0f, 1.0f}  // 左上
+	};
+
+	for (int i = 0; i < 6; i++) {
 		glBegin(GL_POLYGON);
 
-		// Specify the face normal before the face’s vertices
 		glNormal3fv(normals[i]);
 
-		// Draw the four vertices of this face
-		glVertex3fv(points[ face[i][0] ]);
-		glVertex3fv(points[ face[i][1] ]);
-		glVertex3fv(points[ face[i][2] ]);
-		glVertex3fv(points[ face[i][3] ]);
+		// 為每個頂點指定紋理座標和位置
+		glTexCoord2fv(texCoords[0]); glVertex3fv(points[face[i][0]]);
+		glTexCoord2fv(texCoords[1]); glVertex3fv(points[face[i][1]]);
+		glTexCoord2fv(texCoords[2]); glVertex3fv(points[face[i][2]]);
+		glTexCoord2fv(texCoords[3]); glVertex3fv(points[face[i][3]]);
 
 		glEnd();
 	}
+	glDisable(GL_TEXTURE_2D);
 }
 
 

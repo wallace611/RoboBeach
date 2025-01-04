@@ -9,6 +9,7 @@
 #include "object/Fan.h"
 #include "object/Light.h"
 #include "object/Flashlight.h"
+#include "object/Billboard.h"
 
 struct _scene {
 	Floor* sand;
@@ -27,6 +28,7 @@ struct _scene {
 	Fan* fan1;
 	Object* axis;
 	Object* viewVolume;
+	Billboard* splashWater1;
 	
 	Robot* bot;
 	unsigned int currentCamera;
@@ -64,3 +66,5 @@ void selectLight(float val);
 
 void changeColor(float val);
 void changeAttribute(float val);
+void splashWaterUpdate(Object* obj, float deltatime);
+void splashWaterRender(Object* obj);

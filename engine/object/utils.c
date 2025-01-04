@@ -17,6 +17,7 @@
 #include "object/Fan.h"
 #include "object/Light.h"
 #include "object/Flashlight.h"
+#include "object/Billboard.h"
 
 int generate_checkcode(void* pt) {
 	if (pt == NULL) return -1;
@@ -131,6 +132,11 @@ void* obj_casting(void* pt, obj_type_t type) {
 			return up;
 		}
 		break;
+		
+	case BILL:
+		if (((Billboard*) up)->obj_type == BILL) {
+			return up;
+		}
 	}
 	return NULL;
 }
